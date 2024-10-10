@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Optional;
 
 @Service
@@ -15,13 +16,16 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public User registerUser(String email, String password) {
+    public void registerUser(String email, String password) {
         // Encrypt password
         String encodedPassword = passwordEncoder.encode(password);
-        User user = new User(email, encodedPassword);
-        return userRepository.save(user);
+        try {
+            User user = userRepository.save(new User(email, encodedPassword));
+        }catch(Exception e){
+            System.out.println(Arrays.toString(e.getStackTrace()));
+        }
     }
 
     public Optional<User> loginUser(String email, String password) {

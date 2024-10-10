@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: login-server
+  labels:
+    app: login-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: login-server
+  template:
+    metadata:
+      labels:
+        app: login-server
+    spec:
+      containers:
+        - name: login-server
+          image: trojan2877/login-server
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "k8s"
