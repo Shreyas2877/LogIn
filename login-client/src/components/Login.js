@@ -12,6 +12,7 @@ const Login = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setError('')
         const result = await loginController(email, password);
         if (result.success) {
             navigate('/home');
