@@ -24,7 +24,7 @@ const Signup = () => {
         <Container maxWidth="sm">
             <Box mt={5}>
                 <Typography variant="h4" component="h1" gutterBottom>
-                    Signup
+                    Sign-up
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
                 <form onSubmit={handleSubmit}>
@@ -48,7 +48,7 @@ const Signup = () => {
                     />
                     <Box mt={2}>
                         <Button type="submit" variant="contained" color="primary" fullWidth>
-                            Signup
+                            Sign-up
                         </Button>
                     </Box>
                 </form>

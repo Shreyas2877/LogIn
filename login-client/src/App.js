@@ -1,16 +1,26 @@
 // src/App.js
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import AppRoutes from './routes';
+
+const darkTheme = createTheme({
+    palette: {
+        mode: 'dark',
+    },
+});
 
 const App = () => {
     return (
-        <Router>
-            <div>
-                <h1>Login Application</h1>
-                <AppRoutes />
-            </div>
-        </Router>
+        <ThemeProvider theme={darkTheme}>
+            <CssBaseline />
+            <Router>
+                <div>
+                    <AppRoutes />
+                </div>
+            </Router>
+        </ThemeProvider>
     );
 };
 
