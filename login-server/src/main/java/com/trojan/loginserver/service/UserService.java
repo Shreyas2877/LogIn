@@ -1,12 +1,15 @@
 // src/main/java/com/app/service/UserService.java
 package com.trojan.loginserver.service;
 
+import com.trojan.loginserver.exception.DatabaseException;
+import com.trojan.loginserver.exception.ResourceNotFoundException;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.lang.module.ResolutionException;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -24,8 +27,12 @@ public class UserService {
         try {
             User user = userRepository.save(new User(email, encodedPassword));
         }catch(Exception e){
-            System.out.println(Arrays.toString(e.getStackTrace()));
+            throw new DatabaseException("Error saving user to database");
         }
+    }
+
+    public boolean userExists(String email) {
+        return userRepository.findByEmail(email).isPresent();
     }
 
     public Optional<User> loginUser(String email, String password) {
@@ -33,11 +40,13 @@ public class UserService {
         if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
             return user;
         }
-        return Optional.empty();
+        throw new ResourceNotFoundException("User not found");
     }
 
     public void deregisterUser(String email) {
         Optional<User> user = userRepository.findByEmail(email);
-        user.ifPresent(userRepository::delete);
+        user.ifPresentOrElse(userRepository::delete, () -> {
+            throw new ResourceNotFoundException("User Not Found");
+        });
     }
 }

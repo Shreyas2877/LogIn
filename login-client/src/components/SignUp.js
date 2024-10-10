@@ -1,22 +1,32 @@
-// src/components/Signup.js
-import React, { useState } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signupController } from '../controllers/authController';
 import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 const Signup = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const validationSchema = Yup.object({
+        email: Yup.string().email('Invalid email address').required('Required'),
+        password: Yup.string().min(6, 'Password must be at least 6 characters long').required('Required'),
+    });
+
+    const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+        const { email, password } = values;
         const result = await signupController(email, password);
+        setSubmitting(false);
         if (result.success) {
             navigate('/home');
         } else {
-            setError(result.message || "Signup Failed!");
+            console.log("Sign up failed", result);
+            if(result.statusCode === 400){
+                setErrors({ general: result.message || "User doesn't exist" });
+            }
+            else{
+                setErrors({ general: "An Unexpected error occurred, Try again!" });
+            }
         }
     };
 
@@ -26,32 +36,44 @@ const Signup = () => {
                 <Typography variant="h4" component="h1" gutterBottom>
                     Sign-up
                 </Typography>
-                {error && <Alert severity="error">{error}</Alert>}
-                <form onSubmit={handleSubmit}>
-                    <TextField
-                        label="Email"
-                        type="email"
-                        fullWidth
-                        margin="normal"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                    <TextField
-                        label="Password"
-                        type="password"
-                        fullWidth
-                        margin="normal"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    <Box mt={2}>
-                        <Button type="submit" variant="contained" color="primary" fullWidth>
-                            Sign-up
-                        </Button>
-                    </Box>
-                </form>
+                <Formik
+                    initialValues={{ email: '', password: '' }}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {({ isSubmitting, errors }) => (
+                        <Form>
+                            {errors.general && <Alert severity="error">{errors.general}</Alert>}
+                            <Field
+                                as={TextField}
+                                label="Email"
+                                name="email"
+                                type="email"
+                                fullWidth
+                                margin="normal"
+                                error={!!errors.email}
+                                helperText={<ErrorMessage name="email" />}
+                                required
+                            />
+                            <Field
+                                as={TextField}
+                                label="Password"
+                                name="password"
+                                type="password"
+                                fullWidth
+                                margin="normal"
+                                error={!!errors.password}
+                                helperText={<ErrorMessage name="password" />}
+                                required
+                            />
+                            <Box mt={2}>
+                                <Button type="submit" variant="contained" color="primary" fullWidth disabled={isSubmitting}>
+                                    Sign-up
+                                </Button>
+                            </Box>
+                        </Form>
+                    )}
+                </Formik>
             </Box>
         </Container>
     );

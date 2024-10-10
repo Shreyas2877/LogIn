@@ -1,6 +1,7 @@
 // src/main/java/com/app/controller/AuthController.java
 package com.trojan.loginserver.controller;
 
+import com.trojan.loginserver.exception.ResourceNotFoundException;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,8 @@ public class AuthController {
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody User user) {
-        if (userService.loginUser(user.getEmail(), user.getPassword()).isPresent()) {
-            return ResponseEntity.badRequest().body("User already exists");
+        if (userService.userExists(user.getEmail())) {
+            throw new ResourceNotFoundException("User already exists");
         }
         userService.registerUser(user.getEmail(), user.getPassword());
         return ResponseEntity.ok("User registered successfully");
