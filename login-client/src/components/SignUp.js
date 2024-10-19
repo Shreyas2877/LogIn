@@ -18,7 +18,7 @@ const Signup = () => {
         const result = await signupController(email, password);
         setSubmitting(false);
         if (result.success) {
-            navigate('/home');
+            navigate('/login', { state: { message: 'Sign up successful, you can now login' } });
         } else {
             console.log("Sign up failed", result);
             if(result.statusCode === 400){
@@ -34,7 +34,7 @@ const Signup = () => {
         <Container maxWidth="sm">
             <Box mt={5}>
                 <Typography variant="h4" component="h1" gutterBottom>
-                    Sign-up
+                    Sign Up
                 </Typography>
                 <Formik
                     initialValues={{ email: '', password: '' }}
@@ -46,29 +46,27 @@ const Signup = () => {
                             {errors.general && <Alert severity="error">{errors.general}</Alert>}
                             <Field
                                 as={TextField}
-                                label="Email"
                                 name="email"
+                                label="Email"
                                 type="email"
                                 fullWidth
                                 margin="normal"
-                                error={!!errors.email}
                                 helperText={<ErrorMessage name="email" />}
-                                required
+                                error={Boolean(errors.email)}
                             />
                             <Field
                                 as={TextField}
-                                label="Password"
                                 name="password"
+                                label="Password"
                                 type="password"
                                 fullWidth
                                 margin="normal"
-                                error={!!errors.password}
                                 helperText={<ErrorMessage name="password" />}
-                                required
+                                error={Boolean(errors.password)}
                             />
                             <Box mt={2}>
                                 <Button type="submit" variant="contained" color="primary" fullWidth disabled={isSubmitting}>
-                                    Sign-up
+                                    Sign Up
                                 </Button>
                             </Box>
                         </Form>
