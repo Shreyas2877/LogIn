@@ -1,57 +1,70 @@
 // src/components/Login.js
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useContext } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { loginController } from '../controllers/authController';
 import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
+import { AuthContext } from '../context/AuthContext';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+    const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
 
-    const handleSubmit = async (e) => {
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate('/profile');
+        }
+    }, [isAuthenticated, navigate]);
+
+    useEffect(() => {
+        if (location.state && location.state.message) {
+            setSuccessMessage(location.state.message);
+        }
+    }, [location.state]);
+
+    const handleLogin = async (e) => {
         e.preventDefault();
-        setError('')
+        setError('');
         const result = await loginController(email, password);
         if (result.success) {
-            navigate('/home');
+            setIsAuthenticated(true);
+            navigate('/profile', { replace: true }); // Redirect to profile page and replace history
         } else {
-            setError(result.message || "Login Failed!");
+            setError(result.message || 'Login failed');
         }
     };
 
     return (
         <Container maxWidth="sm">
             <Box mt={5}>
+                {successMessage && <Alert severity="success">{successMessage}</Alert>}
                 <Typography variant="h4" component="h1" gutterBottom>
                     Login
                 </Typography>
-                {error && <Alert severity="error">{error}</Alert>}
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleLogin}>
                     <TextField
                         label="Email"
-                        type="email"
-                        fullWidth
-                        margin="normal"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        required
+                        fullWidth
+                        margin="normal"
                     />
                     <TextField
                         label="Password"
                         type="password"
-                        fullWidth
-                        margin="normal"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
-                        required
+                        fullWidth
+                        margin="normal"
                     />
-                    <Box mt={2}>
-                        <Button type="submit" variant="contained" color="primary" fullWidth>
-                            Login
-                        </Button>
-                    </Box>
+                    {error && <Alert severity="error">{error}</Alert>}
+                    <Button variant="contained" color="primary" type="submit">
+                        Login
+                    </Button>
                 </form>
             </Box>
         </Container>

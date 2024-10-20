@@ -1,22 +1,25 @@
 // src/components/Deregister.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Container, Button, Typography, Box, TextField, Alert } from '@mui/material';
 import { deregisterController } from '../controllers/authController';
-import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
 
 const Deregister = () => {
     const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const result = await deregisterController(email, password);
-        if (result.success) {
-            navigate('/home');
-        } else {
-            setError(result.message || "Deregister Failed!");
+    const handleDeregister = async () => {
+        setError(''); // Clear previous error before new deregister attempt
+        try {
+            const result = await deregisterController(email);
+            if (result.success) {
+                navigate('/', { state: { message: 'User de-registered successfully.' } });
+            } else {
+                setError(result.message || "Deregistration Failed!");
+            }
+        } catch (err) {
+            setError("An unexpected error occurred. Please try again.");
         }
     };
 
@@ -27,31 +30,18 @@ const Deregister = () => {
                     Deregister
                 </Typography>
                 {error && <Alert severity="error">{error}</Alert>}
-                <form onSubmit={handleSubmit}>
-                    <TextField
-                        label="Email"
-                        type="email"
-                        fullWidth
-                        margin="normal"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                    />
-                    <TextField
-                        label="Password"
-                        type="password"
-                        fullWidth
-                        margin="normal"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        required
-                    />
-                    <Box mt={2}>
-                        <Button type="submit" variant="contained" color="primary" fullWidth>
-                            Deregister
-                        </Button>
-                    </Box>
-                </form>
+                <TextField
+                    label="Email"
+                    type="email"
+                    fullWidth
+                    margin="normal"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                />
+                <Button variant="contained" color="secondary" onClick={handleDeregister}>
+                    Deregister
+                </Button>
             </Box>
         </Container>
     );
