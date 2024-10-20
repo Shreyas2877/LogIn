@@ -1,17 +1,20 @@
 // src/components/NavBar.js
-import React from 'react';
+import React, { useContext } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { logoutController } from '../controllers/authController';
+import { AuthContext } from '../context/AuthContext';
 
 const NavBar = () => {
     const location = useLocation();
     const navigate = useNavigate();
+    const { setIsAuthenticated } = useContext(AuthContext);
     const isProfilePage = location.pathname === '/profile';
 
     const handleLogout = async () => {
         const result = await logoutController();
         if (result.success) {
+            setIsAuthenticated(false);
             navigate('/', { state: { message: 'Logout successful' } }); // Redirect to home page with message
         } else {
             console.error(result.message || 'Logout failed');
