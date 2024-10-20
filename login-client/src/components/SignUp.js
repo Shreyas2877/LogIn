@@ -65,7 +65,7 @@ const Signup = () => {
                                 error={Boolean(errors.password)}
                             />
                             <Box mt={2}>
-                                <Button type="submit" variant="contained" color="primary" fullWidth disabled={isSubmitting}>
+                                <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
                                     Sign Up
                                 </Button>
                             </Box>

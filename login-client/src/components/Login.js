@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { loginController } from '../controllers/authController';
 import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
 import { AuthContext } from '../context/AuthContext';
+import OAuths from './OAuths'
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -45,6 +46,7 @@ const Login = () => {
                 <Typography variant="h4" component="h1" gutterBottom>
                     Login
                 </Typography>
+                <OAuths/>
                 <form onSubmit={handleLogin}>
                     <TextField
                         label="Email"
