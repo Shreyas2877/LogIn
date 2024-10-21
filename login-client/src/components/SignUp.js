@@ -9,13 +9,14 @@ const Signup = () => {
     const navigate = useNavigate();
 
     const validationSchema = Yup.object({
+        userName: Yup.string().required('Required'),
         email: Yup.string().email('Invalid email address').required('Required'),
         password: Yup.string().min(6, 'Password must be at least 6 characters long').required('Required'),
     });
 
     const handleSubmit = async (values, { setSubmitting, setErrors }) => {
-        const { email, password } = values;
-        const result = await signupController(email, password);
+        const { userName, email, password } = values;
+        const result = await signupController(email, password, userName);
         setSubmitting(false);
         if (result.success) {
             navigate('/login', { state: { message: 'Sign up successful, you can now login' } });
@@ -37,13 +38,23 @@ const Signup = () => {
                     Sign Up
                 </Typography>
                 <Formik
-                    initialValues={{ email: '', password: '' }}
+                    initialValues={{ userName: '', email: '', password: '' }}
                     validationSchema={validationSchema}
                     onSubmit={handleSubmit}
                 >
                     {({ isSubmitting, errors }) => (
                         <Form>
                             {errors.general && <Alert severity="error">{errors.general}</Alert>}
+                            <Field
+                                as={TextField}
+                                name="userName"
+                                label="User Name"
+                                type="text"
+                                fullWidth
+                                margin="normal"
+                                helperText={<ErrorMessage name="userName" />}
+                                error={Boolean(errors.userName)}
+                            />
                             <Field
                                 as={TextField}
                                 name="email"
@@ -64,11 +75,15 @@ const Signup = () => {
                                 helperText={<ErrorMessage name="password" />}
                                 error={Boolean(errors.password)}
                             />
-                            <Box mt={2}>
-                                <Button type="submit" variant="contained" color="primary" fullWidth disabled={isSubmitting}>
-                                    Sign Up
-                                </Button>
-                            </Box>
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                disabled={isSubmitting}
+                            >
+                                Sign Up
+                            </Button>
                         </Form>
                     )}
                 </Formik>

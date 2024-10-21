@@ -1,6 +1,9 @@
 // src/main/java/com/trojan/loginserver/controller/AuthController.java
 package com.trojan.loginserver.controller;
 
+import com.trojan.loginserver.dto.OAuthRequest;
+import com.trojan.loginserver.dto.SignupRequest;
+import com.trojan.loginserver.dto.LoginRequest;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.model.UserProfile;
@@ -36,21 +39,21 @@ public class AuthController {
     private CookieService cookieService;
 
     @PostMapping("/signup")
-    public ResponseEntity<?> signup(@RequestBody User user) {
-        logger.debug("Signup request received for email: {}", user.getEmail());
-        if (userService.userExists(user.getEmail())) {
-            logger.warn("User already exists: {}", user.getEmail());
-            throw new ResourceNotFoundException("User already exists");
+    public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest) {
+        logger.debug("Signup request received for email: {}", signupRequest.getEmail());
+        if (userService.userExists(signupRequest.getEmail())) {
+            logger.warn("User already exists: {}", signupRequest.getEmail());
+            throw new ResourceNotFoundException("User already exists, please login");
         }
-        userService.registerUser(user.getEmail(), user.getPassword());
-        logger.info("User registered successfully: {}", user.getEmail());
+        userService.registerUser(signupRequest.getEmail(), signupRequest.getPassword(), signupRequest.getUserName());
+        logger.info("User registered successfully: {}", signupRequest.getEmail());
         return ResponseEntity.ok("User registered successfully");
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody User user, HttpServletResponse response) {
-        logger.debug("Login request received for email: {}", user.getEmail());
-        Optional<User> existingUser = userService.loginUser(user.getEmail(), user.getPassword());
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+        logger.debug("Login request received for email: {}", loginRequest.getEmail());
+        Optional<User> existingUser = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
         if (existingUser.isPresent()) {
             User loggedInUser = existingUser.get();
             String token = jwtService.generateToken(loggedInUser.getEmail(), loggedInUser.getId());
@@ -58,10 +61,10 @@ public class AuthController {
             Cookie cookie = cookieService.createCookie("jwt", token, 86400); // 1 day in seconds
             response.addCookie(cookie);
 
-            logger.info("Login successful for email: {}", user.getEmail());
+            logger.info("Login successful for email: {}", loginRequest.getEmail());
             return ResponseEntity.ok("Login successful");
         }
-        logger.warn("Invalid login attempt for email: {}", user.getEmail());
+        logger.warn("Invalid login attempt for email: {}", loginRequest.getEmail());
         return ResponseEntity.status(401).body("Invalid email or password");
     }
 
@@ -110,6 +113,11 @@ public class AuthController {
         userService.deregisterUser(user.getEmail());
         logger.info("User deregistered successfully: {}", user.getEmail());
         return ResponseEntity.ok("User deregistered successfully");
+    }
+
+    @PostMapping("/saveUser")
+    public ResponseEntity<?> saveUser(@RequestBody OAuthRequest request){
+        return ResponseEntity.ok(userService.saveOAuthUser(request.getEmail(), request.getUserName(), request.getProvider()));
     }
 
 }

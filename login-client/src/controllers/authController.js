@@ -12,9 +12,9 @@ export const loginController = async (email, password) => {
     }
 };
 
-export const signupController = async (email, password) => {
+export const signupController = async (email, password, userName) => {
     try {
-        const response = await signup(email, password);
+        const response = await signup(email, password, userName);
         return { success: true, data: response.data };
     } catch (error) {
         console.log("Error Caught : %s", error.message);
