@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { loginController } from '../controllers/authController';
 import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
 import { AuthContext } from '../context/AuthContext';
+import OAuth from './OAuth';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -61,11 +62,12 @@ const Login = () => {
                         fullWidth
                         margin="normal"
                     />
-                    {error && <Alert severity="error">{error}</Alert>}
-                    <Button variant="contained" color="primary" type="submit">
+                    <Button type="submit" variant="contained" color="primary" fullWidth>
                         Login
                     </Button>
                 </form>
+                <OAuth />
+                {error && <Alert severity="error">{error}</Alert>}
             </Box>
         </Container>
     );

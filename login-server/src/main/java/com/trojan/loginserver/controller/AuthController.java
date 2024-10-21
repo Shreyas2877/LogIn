@@ -111,4 +111,5 @@ public class AuthController {
         logger.info("User deregistered successfully: {}", user.getEmail());
         return ResponseEntity.ok("User deregistered successfully");
     }
+
 }
