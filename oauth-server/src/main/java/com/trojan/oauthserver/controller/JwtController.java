@@ -29,9 +29,9 @@ public class JwtController {
 
     @GetMapping("/generate-jwt")
     public void generateJwt(@AuthenticationPrincipal OAuth2User principal, HttpServletResponse response) throws IOException {
-        String email = principal.getAttribute("login") != null ? principal.getAttribute("login") : principal.getAttribute("email");
+        String email = principal.getAttribute("email");
         String userName = principal.getAttribute("name");
-        String provider = principal.getAttribute("email") != null ? "Google" : "GitHub";
+        String provider = principal.getAttribute("provider");
 
         // Save the user and get the response
         Map<String, Object> responseBody = userService.saveUser(email, userName, provider);

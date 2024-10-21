@@ -6,7 +6,6 @@ import Signup from '../components/SignUp.js';
 import Deregister from '../components/Deregister';
 import Home from '../components/Home';
 import Profile from '../components/Profile.js';
-import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => (
     <Routes>
