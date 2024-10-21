@@ -2,13 +2,27 @@ import React from 'react';
 import { Button, Box } from '@material-ui/core';
 import { GitHub as GitHubIcon } from '@material-ui/icons';
 import GoogleIcon from '@mui/icons-material/Google';
+import { oAuthGoogleController, oAuthGithubController } from '../controllers/OAuthControlle';
+
 const OAuths = () => {
-    const handleGoogleLogin = () => {
-        // Add your Google login logic here
+    const handleGoogleLogin = async (e) => {
+        e.preventDefault();
+        const result = await oAuthGoogleController();
+        if (result.success) {
+            window.location.href = result.data.url;
+        } else {
+            console.log(result.message);
+        }
     };
 
-    const handleGitHubLogin = () => {
-        // Add your GitHub login logic here
+    const handleGitHubLogin = async (e) => {
+        e.preventDefault();
+        const result = await oAuthGithubController();
+        if (result.success) {
+            window.location.href = result.data.url;
+        } else {
+            console.log(result.message);
+        }
     };
 
     return (

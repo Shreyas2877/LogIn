@@ -25,7 +25,7 @@ public class UserService {
 
     public void registerUser(String email, String password) {
         logger.debug("Registering user with email: {}", email);
-        String encodedPassword = passwordEncoder.encode(password);
+        String encodedPassword = password != null ? passwordEncoder.encode(password) : null;
         try {
             userRepository.save(new User(email, encodedPassword));
             logger.info("User registered successfully with email: {}", email);
@@ -44,10 +44,10 @@ public class UserService {
 
     public Optional<User> loginUser(String email, String password) {
         logger.debug("Attempting login for user with email: {}", email);
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent() && passwordEncoder.matches(password, userOptional.get().getPassword())) {
             logger.info("Login successful for user with email: {}", email);
-            return user;
+            return userOptional;
         }
         logger.warn("Login failed for user with email: {}", email);
         throw new ResourceNotFoundException("User not found");
@@ -55,11 +55,25 @@ public class UserService {
 
     public void deregisterUser(String email) {
         logger.debug("Deregistering user with email: {}", email);
-        Optional<User> user = userRepository.findByEmail(email);
-        user.ifPresentOrElse(userRepository::delete, () -> {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        userOptional.ifPresentOrElse(userRepository::delete, () -> {
             logger.warn("User not found for deregistration with email: {}", email);
             throw new ResourceNotFoundException("User Not Found");
         });
         logger.info("User deregistered successfully with email: {}", email);
+    }
+
+    // Implement logic to get user ID by email
+    public Long getUserId(String email) {
+        logger.debug("Getting user ID for email: {}", email);
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            Long userId = userOptional.get().getId();
+            logger.info("User ID for email {}: {}", email, userId);
+            return userId;
+        } else {
+            logger.warn("User not found for email: {}", email);
+            throw new ResourceNotFoundException("User not found");
+        }
     }
 }
