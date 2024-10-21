@@ -6,14 +6,13 @@ import Signup from '../components/SignUp.js';
 import Deregister from '../components/Deregister';
 import Home from '../components/Home';
 import Profile from '../components/Profile.js';
-import ProtectedRoute from '../components/ProtectedRoute';
 
 const AppRoutes = () => (
     <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/deregister" element={<Deregister />} />
-        <Route path="/profile" element={<ProtectedRoute element={Profile} />} />
+        <Route path="/profile" element={<Profile />} />
         <Route path="/" element={<Home />} />
     </Routes>
 );

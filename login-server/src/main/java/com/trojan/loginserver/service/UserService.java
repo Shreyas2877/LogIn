@@ -4,6 +4,7 @@ package com.trojan.loginserver.service;
 import com.trojan.loginserver.exception.DatabaseException;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
 import com.trojan.loginserver.model.User;
+import com.trojan.loginserver.model.UserProfile;
 import com.trojan.loginserver.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,11 +24,12 @@ public class UserService {
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
-    public void registerUser(String email, String password) {
+    public void registerUser(String email, String password, String userName) {
+        String Provider = "local";
         logger.debug("Registering user with email: {}", email);
         String encodedPassword = passwordEncoder.encode(password);
         try {
-            userRepository.save(new User(email, encodedPassword));
+            userRepository.save(new User(email, encodedPassword, userName, Provider));
             logger.info("User registered successfully with email: {}", email);
         } catch (Exception e) {
             logger.error("Error saving user to database for email: {}", email, e);
@@ -61,5 +63,20 @@ public class UserService {
             throw new ResourceNotFoundException("User Not Found");
         });
         logger.info("User deregistered successfully with email: {}", email);
+    }
+
+    public UserProfile saveOAuthUser(String email, String userName, String provider) {
+        logger.debug("Saving OAuth user with email: {}", email);
+        Optional<User> existingUser = userRepository.findByEmail(email);
+        if (existingUser.isPresent()) {
+            logger.info("User already exists with email: {}", email);
+            return existingUser.get().getUserProfile();
+        }
+        try {
+            return userRepository.save(new User(email, null, userName, provider)).getUserProfile();
+        } catch (Exception e) {
+            logger.error("Error saving OAuth user to database for email: {}", email, e);
+            throw new DatabaseException("Error saving OAuth user to database");
+        }
     }
 }

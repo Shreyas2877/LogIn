@@ -1,9 +1,13 @@
 // src/components/NavBar.js
 import React, { useContext } from 'react';
-import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
+import { AppBar, Toolbar, IconButton, Box } from '@mui/material';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { logoutController } from '../controllers/authController';
 import { AuthContext } from '../context/AuthContext';
+import HomeIcon from '@mui/icons-material/Home';
+import LogoutIcon from '@mui/icons-material/Logout';
+import LoginIcon from '@mui/icons-material/Login';
+import PersonAddIcon from '@mui/icons-material/PersonAdd';
 
 const NavBar = () => {
     const location = useLocation();
@@ -24,27 +28,29 @@ const NavBar = () => {
     return (
         <AppBar position="static">
             <Toolbar>
-                <Typography
-                    variant="h6"
+                <IconButton
+                    edge="start"
+                    color="inherit"
                     component={Link}
                     to="/"
-                    sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit' }}
+                    sx={{ mr: 2 }}
                 >
-                    MyApp
-                </Typography>
+                    <HomeIcon />
+                </IconButton>
+                <Box sx={{ flexGrow: 1 }} />
                 <Box>
                     {isProfilePage ? (
-                        <Button color="inherit" onClick={handleLogout}>
-                            Logout
-                        </Button>
+                        <IconButton color="inherit" onClick={handleLogout}>
+                            <LogoutIcon />
+                        </IconButton>
                     ) : (
                         <>
-                            <Button color="inherit" component={Link} to="/login">
-                                Login
-                            </Button>
-                            <Button color="inherit" component={Link} to="/signup">
-                                Sign Up
-                            </Button>
+                            <IconButton color="inherit" component={Link} to="/login">
+                                <LoginIcon />
+                            </IconButton>
+                            <IconButton color="inherit" component={Link} to="/signup">
+                                <PersonAddIcon />
+                            </IconButton>
                         </>
                     )}
                 </Box>
