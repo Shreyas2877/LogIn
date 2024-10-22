@@ -1,61 +1,94 @@
-// src/components/Signup.js
-import React, { useState } from 'react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { signupController } from '../controllers/authController';
+import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
+import { Formik, Form, Field, ErrorMessage } from 'formik';
+import * as Yup from 'yup';
 
 const Signup = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [error, setError] = useState('');
-    const [success, setSuccess] = useState('');
+    const navigate = useNavigate();
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (password !== confirmPassword) {
-            setError("Passwords do not match");
-            return;
-        }
-        const result = await signupController(email, password);
+    const validationSchema = Yup.object({
+        userName: Yup.string().required('Required'),
+        email: Yup.string().email('Invalid email address').required('Required'),
+        password: Yup.string().min(6, 'Password must be at least 6 characters long').required('Required'),
+    });
+
+    const handleSubmit = async (values, { setSubmitting, setErrors }) => {
+        const { userName, email, password } = values;
+        const result = await signupController(email, password, userName);
+        setSubmitting(false);
         if (result.success) {
-            setSuccess('Signup successful! You can log in now.');
-            setEmail('');
-            setPassword('');
-            setConfirmPassword('');
+            navigate('/login', { state: { message: 'Sign up successful, you can now login' } });
         } else {
-            setError(result.message || 'Signup failed');
+            console.log("Sign up failed", result);
+            if(result.statusCode === 400){
+                setErrors({ general: result.message || "User doesn't exist" });
+            }
+            else{
+                setErrors({ general: "An Unexpected error occurred, Try again!" });
+            }
         }
     };
 
     return (
-        <div>
-            <h2>Sign Up</h2>
-            {error && <p>{error}</p>}
-            {success && <p>{success}</p>}
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    placeholder="Email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                />
-                <input
-                    type="password"
-                    placeholder="Confirm Password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                />
-                <button type="submit">Sign Up</button>
-            </form>
-        </div>
+        <Container maxWidth="sm">
+            <Box mt={5}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Sign Up
+                </Typography>
+                <Formik
+                    initialValues={{ userName: '', email: '', password: '' }}
+                    validationSchema={validationSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {({ isSubmitting, errors }) => (
+                        <Form>
+                            {errors.general && <Alert severity="error">{errors.general}</Alert>}
+                            <Field
+                                as={TextField}
+                                name="userName"
+                                label="User Name"
+                                type="text"
+                                fullWidth
+                                margin="normal"
+                                helperText={<ErrorMessage name="userName" />}
+                                error={Boolean(errors.userName)}
+                            />
+                            <Field
+                                as={TextField}
+                                name="email"
+                                label="Email"
+                                type="email"
+                                fullWidth
+                                margin="normal"
+                                helperText={<ErrorMessage name="email" />}
+                                error={Boolean(errors.email)}
+                            />
+                            <Field
+                                as={TextField}
+                                name="password"
+                                label="Password"
+                                type="password"
+                                fullWidth
+                                margin="normal"
+                                helperText={<ErrorMessage name="password" />}
+                                error={Boolean(errors.password)}
+                            />
+                            <Button
+                                type="submit"
+                                fullWidth
+                                variant="contained"
+                                color="primary"
+                                disabled={isSubmitting}
+                            >
+                                Sign Up
+                            </Button>
+                        </Form>
+                    )}
+                </Formik>
+            </Box>
+        </Container>
     );
 };
 

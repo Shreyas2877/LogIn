@@ -1,0 +1,17 @@
+apiVersion: skaffold/v2beta12
+kind: Config
+metadata:
+  name: login-server
+build:
+  artifacts:
+    - image: trojan2877/login-server
+      context: .
+      jib:
+        project: com.trojan:login-server
+deploy:
+  kubectl:
+    manifests:
+      - k8s/deployment.yaml
+      - k8s/service.yaml
+      - k8s/mysql-deployment.yaml
+      - k8s/mysql-service.yaml
