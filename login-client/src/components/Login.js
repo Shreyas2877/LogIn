@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { loginController } from '../controllers/authController';
 import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
 import { AuthContext } from '../context/AuthContext';
+import { LoginContext } from '../context/LoginContext';
 import OAuth from './OAuth';
 
 const Login = () => {
@@ -14,6 +15,7 @@ const Login = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
+    const { setHasLoggedIn } = useContext(LoginContext);
 
     useEffect(() => {
         if (isAuthenticated) {
@@ -38,7 +40,8 @@ const Login = () => {
         const result = await loginController(email, password);
         if (result.success) {
             setIsAuthenticated(true);
-            navigate('/profile', { replace: true }); // Redirect to profile page and replace history
+            setHasLoggedIn(true);
+            navigate('/otp', {state: { email }}, { replace: true }); // Redirect to profile page and replace history
         } else {
             setError(result.message || 'Login failed');
         }

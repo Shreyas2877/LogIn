@@ -27,6 +27,12 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime registrationTime;
 
+    @Column(nullable = true)
+    private String emailOtp;
+
+    @Column(nullable = true)
+    private LocalDateTime otpExpiration;
+
     public User() {
         this.registrationTime = LocalDateTime.now();
     }
@@ -90,5 +96,21 @@ public class User {
 
     public UserProfile getUserProfile() {
         return new UserProfile(this.email, this.id);
+    }
+
+    public String getEmailOtp() {
+        return emailOtp;
+    }
+
+    public void setEmailOtp(String emailOtp) {
+        this.emailOtp = emailOtp;
+    }
+
+    public LocalDateTime getOtpExpiration() {
+        return otpExpiration;
+    }
+
+    public void setOtpExpiration(LocalDateTime otpExpiration) {
+        this.otpExpiration = otpExpiration;
     }
 }
