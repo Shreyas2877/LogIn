@@ -30,6 +30,11 @@ const Login = () => {
     const handleLogin = async (e) => {
         e.preventDefault();
         setError('');
+
+        if (!email || !password) {
+            setError('Email and password are required');
+            return;
+        }
         const result = await loginController(email, password);
         if (result.success) {
             setIsAuthenticated(true);
@@ -41,7 +46,7 @@ const Login = () => {
 
     return (
         <Container maxWidth="sm">
-            <Box mt={5}>
+           <Box mt={5}>
                 {successMessage && <Alert severity="success">{successMessage}</Alert>}
                 <Typography variant="h4" component="h1" gutterBottom>
                     Login
