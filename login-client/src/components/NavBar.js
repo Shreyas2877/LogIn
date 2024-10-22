@@ -14,12 +14,15 @@ const NavBar = () => {
     const navigate = useNavigate();
     const { setIsAuthenticated } = useContext(AuthContext);
     const isProfilePage = location.pathname === '/profile';
+    const isHomePage = location.pathname === '/';
+    const isLoginPage = location.pathname === '/login';
+    const isSignUpPage = location.pathname === '/signup';
 
     const handleLogout = async () => {
         const result = await logoutController();
         if (result.success) {
             setIsAuthenticated(false);
-            navigate('/', { state: { message: 'Logout successful' } }); // Redirect to home page with message
+            navigate('/', { state: { message: 'Logout successful', fromLogout: true } }); // Redirect to home page with message
         } else {
             console.error(result.message || 'Logout failed');
         }
@@ -28,33 +31,42 @@ const NavBar = () => {
     return (
         <AppBar position="static">
             <Toolbar>
-                <IconButton
-                    edge="start"
-                    color="inherit"
-                    component={Link}
-                    to="/"
-                    sx={{ mr: 2 }}
-                    style={{ display: isProfilePage ? 'none' : 'inline-flex' }}
-                >
-                    <HomeIcon />
-                </IconButton>
-                <Box sx={{ flexGrow: 1 }} />
-                <Box>
-                    {isProfilePage ? (
-                        <IconButton color="inherit" onClick={handleLogout}>
-                            <LogoutIcon />
-                        </IconButton>
-                    ) : (
-                        <>
-                            <IconButton color="inherit" component={Link} to="/login">
-                                <LoginIcon />
-                            </IconButton>
-                            <IconButton color="inherit" component={Link} to="/signup">
-                                <PersonAddIcon />
-                            </IconButton>
-                        </>
-                    )}
-                </Box>
+                {!isProfilePage && (
+                    <IconButton
+                        edge="start"
+                        color="inherit"
+                        aria-label="home"
+                        component={Link}
+                        to="/"
+                        style={{ display: isProfilePage ? 'none' : 'inline-flex' }}
+                    >
+                        <HomeIcon />
+                    </IconButton>
+                )}
+                <Box flexGrow={1} />
+                {isProfilePage ? (
+                    <IconButton
+                        edge="end"
+                        color="inherit"
+                        aria-label="logout"
+                        onClick={handleLogout}
+                    >
+                        <LogoutIcon />
+                    </IconButton>
+                ) : (
+                    <>
+                        {(isHomePage || isLoginPage || isSignUpPage) && (
+                            <>
+                                <IconButton color="inherit" component={Link} to="/login">
+                                    <LoginIcon />
+                                </IconButton>
+                                <IconButton color="inherit" component={Link} to="/signup">
+                                    <PersonAddIcon />
+                                </IconButton>
+                            </>
+                        )}
+                    </>
+                )}
             </Toolbar>
         </AppBar>
     );

@@ -1,34 +1,10 @@
+// src/components/Profile.js
 import React, { useEffect, useState } from 'react';
-import { Container, Typography, Box, Alert, Card, CardContent, Avatar } from '@mui/material';
-import { styled, keyframes } from '@mui/system';
+import { Container, Typography, Box, Card, CardContent, Avatar } from '@mui/material';
+import { styled } from '@mui/system';
 import { fetchProfileController } from '../controllers/authController';
 import { useNavigate } from 'react-router-dom';
-
-const fadeInDown = keyframes`
-  0% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-  100% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-`;
-
-const fadeOutUp = keyframes`
-  0% {
-    transform: translateY(0);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(-100%);
-    opacity: 0;
-  }
-`;
-
-const AnimatedAlert = styled(Alert)`
-  animation: ${({ show }) => (show ? fadeInDown : fadeOutUp)} 1s forwards;
-`;
+import { fadeInDown, AnimatedAlert } from './animations';
 
 const WelcomeText = styled(Typography)`
   animation: ${fadeInDown} 2s ease-in-out;
@@ -78,7 +54,9 @@ const Profile = () => {
         <Container maxWidth="sm">
             <Box mt={5}>
                 {error ? (
-                    <Alert severity="error">{error}</Alert>
+                    <AnimatedAlert severity="error" show={true}>
+                        {error}
+                    </AnimatedAlert>
                 ) : profile ? (
                     <>
                         <WelcomeText variant="h6">
