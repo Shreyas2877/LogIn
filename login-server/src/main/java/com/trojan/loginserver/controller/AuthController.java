@@ -90,9 +90,10 @@ public class AuthController {
             Claims claims = jwtService.validateToken(token);
             String email = claims.getSubject();
             Long id = claims.get("id", Long.class);
-
+            //retrieve user profile from database
+            String userName = userService.getUserName(email);
             logger.debug("Profile request for email: {}", email);
-            return ResponseEntity.ok(new UserProfile(email, id));
+            return ResponseEntity.ok(new UserProfile(email, id, userName));
         } catch (Exception e) {
             logger.error("Invalid token", e);
             return ResponseEntity.status(401).body("Invalid token");
