@@ -34,6 +34,7 @@ const NavBar = () => {
                     component={Link}
                     to="/"
                     sx={{ mr: 2 }}
+                    style={{ display: isProfilePage ? 'none' : 'inline-flex' }}
                 >
                     <HomeIcon />
                 </IconButton>

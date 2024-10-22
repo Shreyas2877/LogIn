@@ -79,4 +79,15 @@ public class UserService {
             throw new DatabaseException("Error saving OAuth user to database");
         }
     }
+
+    public String getUserName(String email){
+        logger.debug("Fetching user profile for email: {}", email);
+        Optional<User> user = userRepository.findByEmail(email);
+        if(user.isPresent()){
+            logger.info("User profile fetched successfully for email: {}", email);
+            return user.get().getUserName();
+        }
+        logger.warn("User not found for fetching profile with email: {}", email);
+        throw new ResourceNotFoundException("User Not Found");
+    }
 }
