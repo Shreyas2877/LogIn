@@ -33,7 +33,7 @@ public class EmailController {
     }
 
     @PostMapping("/validate")
-    public ResponseEntity<String> validateOtp(@RequestParam String email, @RequestParam String otp, HttpServletResponse response) {
+    public ResponseEntity<String> validateOtp(@RequestParam String email, @RequestParam String otp, HttpServletResponse response) throws Exception {
         boolean isValid = emailService.validateOtp(email, otp);
         if (isValid) {
             Optional<User> user = userService.getUserWithEmail(email);

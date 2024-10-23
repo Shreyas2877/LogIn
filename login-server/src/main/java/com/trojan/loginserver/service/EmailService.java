@@ -3,6 +3,7 @@ package com.trojan.loginserver.service;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.repository.UserRepository;
+import com.trojan.loginserver.util.EncryptionUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -27,17 +28,22 @@ public class EmailService {
     @Autowired
     private UserRepository userRepository;
 
-    public void sendOtp(String email) {
+    @Autowired
+    private EncryptionUtil encryptionUtil;
+
+    public void sendOtp(String email) throws Exception {
         String otp = generateOtp();
+        System.out.println("OTP: " + otp);
         LocalDateTime expirationTime = LocalDateTime.now().plusMinutes(5);
 
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            user.setEmailOtp(otp);
+            String EncOtp = encryptionUtil.encrypt(otp);
+            user.setEmailOtp(EncOtp);
             user.setOtpExpiration(expirationTime);
             userRepository.save(user);
-
+            System.out.println("Control here");
             try {
                 sendEmail(email, otp);
             } catch (MessagingException e) {
@@ -73,11 +79,12 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    public boolean validateOtp(String email, String otp) {
+    public boolean validateOtp(String email, String otp) throws Exception {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
-            return user.getEmailOtp().equals(otp) && user.getOtpExpiration().isAfter(LocalDateTime.now());
+            String decryptedOtp = encryptionUtil.decrypt(user.getEmailOtp());
+            return decryptedOtp.equals(otp) && user.getOtpExpiration().isAfter(LocalDateTime.now());
         }
         return false;
     }

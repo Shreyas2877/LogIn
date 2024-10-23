@@ -48,13 +48,13 @@ const Home = () => {
     return (
         <Container maxWidth="md">
             <Box mt={5} mb={10}>
-                {showMessage && (
+                {
                     <AnimatedAlert show={showMessage} severity="success">
                         {message}
                     </AnimatedAlert>
-                )}
+                }
                 <WelcomeText variant="h3" component="h1" gutterBottom>
-                    Welcome to Our App!
+                    Welcome to TrojAuth
                 </WelcomeText>
                 <SubText variant="h5" gutterBottom>
                     Discover the features and benefits of using our application.

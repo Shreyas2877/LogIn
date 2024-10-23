@@ -25,6 +25,15 @@ export const fadeOutUp = keyframes`
   }
 `;
 
+export const fadeInBackground = keyframes`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`;
+
 export const AnimatedAlert = styled(Alert)`
   animation: ${({ show }) => (show ? fadeInDown : fadeOutUp)} 1s forwards;
   background-color: transparent; /* Remove background */
