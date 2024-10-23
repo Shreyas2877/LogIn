@@ -1,11 +1,11 @@
 // src/components/Login.js
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { loginController } from '../controllers/authController';
+import { loginController, sendEmailController } from '../controllers/authController';
 import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
-import { AuthContext } from '../context/AuthContext';
 import { LoginContext } from '../context/LoginContext';
 import OAuth from './OAuth';
+import Cookies from 'js-cookie';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -14,14 +14,15 @@ const Login = () => {
     const [successMessage, setSuccessMessage] = useState('');
     const navigate = useNavigate();
     const location = useLocation();
-    const { isAuthenticated, setIsAuthenticated } = useContext(AuthContext);
     const { setHasLoggedIn } = useContext(LoginContext);
 
     useEffect(() => {
-        if (isAuthenticated) {
+        // Check if JWT token is present in cookies
+        const token = Cookies.get('jwt');
+        if (token) {
             navigate('/profile');
         }
-    }, [isAuthenticated, navigate]);
+    }, [navigate]);
 
     useEffect(() => {
         if (location.state && location.state.message) {
@@ -37,11 +38,20 @@ const Login = () => {
             setError('Email and password are required');
             return;
         }
+
         const result = await loginController(email, password);
         if (result.success) {
-            setIsAuthenticated(true);
             setHasLoggedIn(true);
-            navigate('/otp', {state: { email }}, { replace: true }); // Redirect to profile page and replace history
+
+            // Call the sendEmail method from AuthController
+            try {
+                await sendEmailController(email);
+            } catch (error) {
+                console.error('Failed to send OTP email:', error);
+            }
+
+            // Redirect to OTP page regardless of the email sending result
+            navigate('/otp', { state: { email } }, { replace: true });
         } else {
             setError(result.message || 'Login failed');
         }
@@ -49,7 +59,7 @@ const Login = () => {
 
     return (
         <Container maxWidth="sm">
-           <Box mt={5}>
+            <Box mt={5}>
                 {successMessage && <Alert severity="success">{successMessage}</Alert>}
                 <Typography variant="h4" component="h1" gutterBottom>
                     Login
@@ -70,12 +80,12 @@ const Login = () => {
                         fullWidth
                         margin="normal"
                     />
+                    {error && <Alert severity="error">{error}</Alert>}
                     <Button type="submit" variant="contained" color="primary" fullWidth>
                         Login
                     </Button>
                 </form>
                 <OAuth />
-                {error && <Alert severity="error">{error}</Alert>}
             </Box>
         </Container>
     );

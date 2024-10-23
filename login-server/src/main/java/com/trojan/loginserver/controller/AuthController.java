@@ -55,11 +55,8 @@ public class AuthController {
         logger.debug("Login request received for email: {}", loginRequest.getEmail());
         Optional<User> existingUser = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
         if (existingUser.isPresent()) {
-            User loggedInUser = existingUser.get();
-            String token = jwtService.generateToken(loggedInUser.getEmail(), loggedInUser.getId());
-
-            Cookie cookie = cookieService.createCookie("jwt", token, 86400); // 1 day in seconds
-            response.addCookie(cookie);
+            //set this if enable MFA is present in properties
+            //userService.setJwt(response, existingUser);
 
             logger.info("Login successful for email: {}", loginRequest.getEmail());
             return ResponseEntity.ok("Login successful");

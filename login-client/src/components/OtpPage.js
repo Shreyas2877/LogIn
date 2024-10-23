@@ -1,79 +1,64 @@
+// src/components/OtpPage.js
 import React, { useState, useContext, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Container, Box, Card, CardContent, Typography, TextField, Button } from '@mui/material';
+import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
+import { validateOtp } from '../controllers/authController';
 import { LoginContext } from '../context/LoginContext';
 
 const OtpPage = () => {
-  const [otp, setOtp] = useState("");
-  const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { hasLoggedIn } = useContext(LoginContext);
-  const email = location.state?.email || ""; // Get email from location state
+    const [otp, setOtp] = useState('');
+    const [error, setError] = useState('');
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { hasLoggedIn} = useContext(LoginContext);
 
-  useEffect(() => {
-    if (!hasLoggedIn) {
-      navigate('/login');
-    }
+    const email = location.state?.email;
+
+    useEffect(() => {
+      if (!hasLoggedIn) {
+          navigate('/login');
+      }
   }, [hasLoggedIn, navigate]);
 
-  const handleOtpSubmit = async (e) => {
-    e.preventDefault();
-    if (otp.trim() === "") {
-      setError("OTP cannot be empty");
-      return;
-    }
-    // Make call to backend with the OTP. /email-otp
-    // If successful go ahead with auth logic.
-    // Authentication logic here. 
-    navigate('/profile');
-  };
+    const handleOtpSubmit = async (e) => {
+        e.preventDefault();
+        setError('');
 
-  return (
-    <Container maxWidth="sm">
-      <Box mt={5}>
-        <Card>
-          <CardContent>
-            <Typography
-              variant="h5"
-              component="h1"
-              gutterBottom
-              sx={{ fontWeight: "bold", color: "primary.main" }}
-            >
-              Enter OTP
-            </Typography>
-            <Typography
-              variant="body1"
-              color="textSecondary"
-              gutterBottom
-            >
-              The OTP has been sent to {email}
-            </Typography>
-            <form onSubmit={handleOtpSubmit}>
-              <TextField
-                label="OTP"
-                variant="outlined"
-                fullWidth
-                value={otp}
-                onChange={(e) => setOtp(e.target.value)}
-                error={!!error}
-                helperText={error}
-                margin="normal"
-              />
-              <Button
-                type="submit"
-                variant="contained"
-                color="primary"
-                fullWidth
-              >
-                Submit
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
-      </Box>
-    </Container>
-  );
+        if (!otp) {
+            setError('OTP is required');
+            return;
+        }
+
+        const result = await validateOtp(email, otp);
+        if (result.success) {
+            navigate('/profile');
+        } else {
+            setError(result.message || 'Invalid or expired OTP');
+        }
+    };
+
+    return (
+        <Container maxWidth="sm">
+            <Box mt={5}>
+                <Typography variant="h4" component="h1" gutterBottom>
+                    Enter OTP
+                </Typography>
+                <form onSubmit={handleOtpSubmit}>
+                    <TextField
+                        label="OTP"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        fullWidth
+                        margin="normal"
+                    />
+                    {error && <Alert severity="error">{error}</Alert>}
+                    <Button type="submit" variant="contained" color="primary" fullWidth>
+                        Submit
+                    </Button>
+                </form>
+            </Box>
+        </Container>
+    );
 };
 
 export default OtpPage;

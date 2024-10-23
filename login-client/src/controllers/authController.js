@@ -1,6 +1,5 @@
 // src/controllers/authController.js
-import { login, signup, deregister, fetchProfile } from '../models/authModel';
-import axiosInstance from '../apiConfig';
+import { login, signup, deregister, fetchProfile, logout, sendEmail, verifyOtp } from '../models/authModel';
 
 export const loginController = async (email, password) => {
     try {
@@ -44,10 +43,30 @@ export const fetchProfileController = async () => {
 
 export const logoutController = async () => {
     try {
-        await axiosInstance.post('/logout');
-        return { success: true };
+        const response = await logout();
+        return { success: true, data: response.data };
     } catch (error) {
         console.log("Error Caught : %s", error.message);
-        return { success: false, message: error.response?.data?.message || 'Logout error' };
+        return { success: false, statusCode: error.response.status, message: error.response?.data?.message || 'Logout error' };
     }
 };
+
+export const sendEmailController = async (email) => {
+    try {
+        const response = await sendEmail(email);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.log("Error Caught : %s", error.message);
+        return { success: false, statusCode: error.response.status, message: error.response?.data?.message || 'Send email error' };
+    }
+};
+
+export const validateOtp = async (email, otp) => {
+    try {
+        const response = await verifyOtp(email, otp);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.log("Error Caught : %s", error.message);
+        return { success: false, statusCode: error.response.status, message: error.response?.data?.message || 'OTP validation error' };
+    }
+}
