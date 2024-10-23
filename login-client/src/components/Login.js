@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { loginController, sendEmailController } from '../controllers/authController';
-import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
+import { Container, TextField, Button, Typography, Box, Alert, Link } from '@mui/material';
 import { LoginContext } from '../context/LoginContext';
 import OAuth from './OAuth';
 import Cookies from 'js-cookie';
@@ -85,6 +85,11 @@ const Login = () => {
                         Login
                     </Button>
                 </form>
+                <Box mt={2}>
+                    <Typography variant="body2">
+                        New user? <Link href="/signup">Sign up here</Link>
+                    </Typography>
+                </Box>
                 <OAuth />
             </Box>
         </Container>

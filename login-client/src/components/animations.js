@@ -27,4 +27,9 @@ export const fadeOutUp = keyframes`
 
 export const AnimatedAlert = styled(Alert)`
   animation: ${({ show }) => (show ? fadeInDown : fadeOutUp)} 1s forwards;
+  background-color: transparent; /* Remove background */
+  padding: 0; /* Remove padding */
+  margin: 0; /* Remove margin */
+  color: inherit; /* Ensure text color is inherited */
+  box-shadow: none; /* Remove any box shadow */
 `;

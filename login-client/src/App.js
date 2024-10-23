@@ -1,10 +1,9 @@
-// src/App.js
 import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import AppRoutes from './routes';
+import { ThemeProvider, CssBaseline, createTheme } from '@material-ui/core';
 import NavBar from './components/NavBar';
+import AppRoutes from './routes';
+import Background from './styles/Background'; // Import the Background component
 
 const darkTheme = createTheme({
     palette: {
@@ -16,12 +15,33 @@ const App = () => {
     return (
         <ThemeProvider theme={darkTheme}>
             <CssBaseline />
-            <Router>
-                <NavBar />
-                <div>
-                    <AppRoutes />
+            <div
+                style={{
+                    position: 'relative',
+                    overflow: 'hidden',
+                    minHeight: '100vh',
+                }}
+            >
+                <Background /> {/* Add the Background component */}
+                <div
+                    style={{
+                        position: 'relative',
+                        zIndex: 1,
+                        backgroundRepeat: 'no-repeat',
+                        backgroundSize: '100% 100%',
+                        backgroundPosition: 'center',
+                        backgroundAttachment: 'fixed',
+                        minHeight: '100vh',
+                    }}
+                >
+                    <Router>
+                        <NavBar />
+                        <div>
+                            <AppRoutes />
+                        </div>
+                    </Router>
                 </div>
-            </Router>
+            </div>
         </ThemeProvider>
     );
 };

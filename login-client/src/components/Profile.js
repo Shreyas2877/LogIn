@@ -72,7 +72,7 @@ const Profile = () => {
                                         {profile.userName}
                                     </Typography>
                                 </Box>
-                                <Typography variant="body2" color="text.secondary">
+                                <Typography variant="body2" >
                                     Email: {profile.email}
                                 </Typography>
                             </CardContent>

@@ -5,15 +5,15 @@ import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 
-
+import jakarta.mail.MessagingException;
+import jakarta.mail.internet.MimeMessage;
 import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Random;
-
 
 @Service
 public class EmailService {
@@ -38,7 +38,11 @@ public class EmailService {
             user.setOtpExpiration(expirationTime);
             userRepository.save(user);
 
-            sendEmail(email, otp);
+            try {
+                sendEmail(email, otp);
+            } catch (MessagingException e) {
+                throw new RuntimeException("Failed to send email", e);
+            }
         } else {
             throw new ResourceNotFoundException("User not found");
         }
@@ -50,12 +54,22 @@ public class EmailService {
         return String.valueOf(otp);
     }
 
-    private void sendEmail(String toEmail, String otp) {
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(fromEmail);
-        message.setTo(toEmail);
-        message.setSubject("Your OTP Code");
-        message.setText("Your OTP code is: " + otp);
+    private void sendEmail(String toEmail, String otp) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setFrom(fromEmail);
+        helper.setTo(toEmail);
+        helper.setSubject("Your OTP Code for Trojan Auth");
+
+        String htmlContent = "<html><body>"
+                + "<h1>Your OTP Code</h1>"
+                + "<p>Your OTP code is: <strong>" + otp + "</strong></p>"
+                + "<p>This code will expire in 5 minutes.</p>"
+                + "</body></html>";
+
+        helper.setText(htmlContent, true);
+
         mailSender.send(message);
     }
 
