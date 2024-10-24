@@ -34,10 +34,8 @@ public class EmailController {
 
     @PostMapping("/validate")
     public ResponseEntity<String> validateOtp(@RequestParam String email, @RequestParam String otp, HttpServletResponse response) throws Exception {
-        boolean isValid = emailService.validateOtp(email, otp);
+        boolean isValid = emailService.validateOtp(email, otp, response);
         if (isValid) {
-            Optional<User> user = userService.getUserWithEmail(email);
-            userService.setJwt(response, user);
             return new ResponseEntity<>("Email verified successfully", HttpStatus.OK);
         } else {
             return new ResponseEntity<>("Invalid or expired OTP", HttpStatus.BAD_REQUEST);

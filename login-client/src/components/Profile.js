@@ -76,21 +76,24 @@ const Profile = () => {
           </AnimatedAlert>
         ) : profile ? (
           <>
-            <WelcomeText variant="h6">Welcome, {profile.userName}!</WelcomeText>
+            <WelcomeText variant="h6">Welcome, {profile.user}</WelcomeText>
             <StyledCard>
               <CardContent>
                 <Box display="flex" alignItems="center" mb={2}>
                   <Avatar sx={{ bgcolor: "primary.main", mr: 2 }}>
-                    {profile.userName.charAt(0).toUpperCase()}
+                    {profile.user.charAt(0).toUpperCase()}
                   </Avatar>
                   <Typography variant="h5" component="div">
-                    {profile.userName}
+                    {profile.user}
                   </Typography>
                 </Box>
                 <Typography variant="body2">Email: {profile.email}</Typography>
               </CardContent>
             </StyledCard>
-            <AnimatedSecuritySettings /> 
+            <AnimatedSecuritySettings 
+              emailVerified={profile.emailVerified} 
+              mfaEnabled={profile.mfaEnabled} 
+            /> 
           </>
         ) : (
           <WelcomeText variant="h6">Loading...</WelcomeText>

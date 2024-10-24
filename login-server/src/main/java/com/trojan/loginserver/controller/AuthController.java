@@ -5,6 +5,7 @@ import com.trojan.loginserver.dto.OAuthRequest;
 import com.trojan.loginserver.dto.SignupRequest;
 import com.trojan.loginserver.dto.LoginRequest;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
+import com.trojan.loginserver.model.MfaStatus;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.model.UserProfile;
 import com.trojan.loginserver.service.CookieService;
@@ -56,7 +57,10 @@ public class AuthController {
         Optional<User> existingUser = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
         if (existingUser.isPresent()) {
             //set this if enable MFA is present in properties
-            //userService.setJwt(response, existingUser);
+            User currentUser = existingUser.get();
+            if(!currentUser.getMfaEnabled().equals(MfaStatus.TRUE)){
+                userService.setJwt(response, existingUser);
+            }
 
             logger.info("Login successful for email: {}", loginRequest.getEmail());
             return ResponseEntity.ok("Login successful");
@@ -88,9 +92,9 @@ public class AuthController {
             String email = claims.getSubject();
             Long id = claims.get("id", Long.class);
             //retrieve user profile from database
-            String userName = userService.getUserName(email);
+            UserProfile userProfile = userService.getUserName(email);
             logger.debug("Profile request for email: {}", email);
-            return ResponseEntity.ok(new UserProfile(email, id, userName));
+            return ResponseEntity.ok(userProfile);
         } catch (Exception e) {
             logger.error("Invalid token", e);
             return ResponseEntity.status(401).body("Invalid token");

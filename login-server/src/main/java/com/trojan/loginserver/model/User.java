@@ -1,5 +1,4 @@
-// src/main/java/com/trojan/loginserver/model/User.java
-        package com.trojan.loginserver.model;
+package com.trojan.loginserver.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
@@ -33,15 +32,26 @@ public class User {
     @Column(nullable = true)
     private LocalDateTime otpExpiration;
 
+    @Column
+    private boolean emailVerified;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private MfaStatus mfaEnabled;
+
     public User() {
         this.registrationTime = LocalDateTime.now();
+        this.emailVerified = false;
+        this.mfaEnabled = MfaStatus.FALSE;
     }
 
-    public User(String email, String password, String userName, String provider) {
+    public User(String email, String password, String userName, String provider, boolean emailVerified, MfaStatus mfaEnabled){
         this.email = email;
         this.password = password;
         this.userName = userName;
         this.provider = provider;
+        this.emailVerified = emailVerified;
+        this.mfaEnabled = mfaEnabled;
         this.registrationTime = LocalDateTime.now();
     }
 
@@ -70,10 +80,6 @@ public class User {
         this.password = password;
     }
 
-    public String getUserName() {
-        return userName;
-    }
-
     public void setUserName(String userName) {
         this.userName = userName;
     }
@@ -95,7 +101,7 @@ public class User {
     }
 
     public UserProfile getUserProfile() {
-        return new UserProfile(this.email, this.id);
+        return new UserProfile(this.email, this.id, this.userName ,this.emailVerified, this.mfaEnabled);
     }
 
     public String getEmailOtp() {
@@ -112,5 +118,21 @@ public class User {
 
     public void setOtpExpiration(LocalDateTime otpExpiration) {
         this.otpExpiration = otpExpiration;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public MfaStatus getMfaEnabled() {
+        return mfaEnabled;
+    }
+
+    public void setMfaEnabled(MfaStatus mfaEnabled) {
+        this.mfaEnabled = mfaEnabled;
     }
 }

@@ -4,6 +4,7 @@ import com.trojan.loginserver.exception.ResourceNotFoundException;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.repository.UserRepository;
 import com.trojan.loginserver.util.EncryptionUtil;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -30,6 +31,9 @@ public class EmailService {
 
     @Autowired
     private EncryptionUtil encryptionUtil;
+
+    @Autowired
+    private UserService userService;
 
     public void sendOtp(String email) throws Exception {
         String otp = generateOtp();
@@ -79,12 +83,15 @@ public class EmailService {
         mailSender.send(message);
     }
 
-    public boolean validateOtp(String email, String otp) throws Exception {
+    public boolean validateOtp(String email, String otp, HttpServletResponse response) throws Exception {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
             User user = userOptional.get();
             String decryptedOtp = encryptionUtil.decrypt(user.getEmailOtp());
-            return decryptedOtp.equals(otp) && user.getOtpExpiration().isAfter(LocalDateTime.now());
+            if(decryptedOtp.equals(otp) && user.getOtpExpiration().isAfter(LocalDateTime.now())) {
+                userService.setJwt(response, userOptional);
+                return true;
+            }
         }
         return false;
     }

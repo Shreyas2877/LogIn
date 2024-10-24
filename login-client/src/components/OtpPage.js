@@ -12,6 +12,7 @@ import {
   Card,
   CardContent,
 } from "@mui/material";
+import Cookies from "js-cookie";
 
 const OtpPage = () => {
   const [otp, setOtp] = useState("");
@@ -21,6 +22,14 @@ const OtpPage = () => {
   const { hasLoggedIn } = useContext(LoginContext);
 
   const email = location.state?.email;
+
+  useEffect(() => {
+    // Check if JWT token is present in cookies
+    const token = Cookies.get("jwt");
+    if (token) {
+      navigate("/profile");
+    }
+  }, [navigate]);
 
   useEffect(() => {
     if (!hasLoggedIn) {

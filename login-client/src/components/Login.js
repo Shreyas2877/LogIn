@@ -1,4 +1,3 @@
-// src/components/Login.js
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import {
@@ -64,15 +63,23 @@ const Login = () => {
     if (result.success) {
       setHasLoggedIn(true);
 
-      // Call the sendEmail method from AuthController
-      try {
-        await sendEmailController(email);
-      } catch (error) {
-        console.error("Failed to send OTP email:", error);
-      }
+      // Send OTP email
+      
 
-      // Redirect to OTP page regardless of the email sending result
-      navigate("/otp", { state: { email } }, { replace: true });
+      // Check if JWT token is present in cookies
+      const token = Cookies.get("jwt");
+      if (token) {
+        navigate("/profile");
+      } else {
+        try {
+          await sendEmailController(email);
+        } catch (error) {
+          console.error("Failed to send OTP email:", error);
+          setError("Failed to send OTP email");
+          return;
+        }
+        navigate("/otp", { state: { email } }, { replace: true });
+      }
     } else {
       setError(result.message || "Login failed");
     }
@@ -82,7 +89,9 @@ const Login = () => {
     <Container maxWidth="sm">
       <Box mt={5}>
         <Box mb={2}>
-          <AnimatedAlert severity="success" show = {successMessage}>{successMessage}</AnimatedAlert>
+          <AnimatedAlert severity="success" show={successMessage}>
+            {successMessage}
+          </AnimatedAlert>
         </Box>
         <Typography variant="h4" component="h1" gutterBottom>
           Login

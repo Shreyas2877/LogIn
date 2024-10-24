@@ -3,6 +3,7 @@ package com.trojan.loginserver.service;
 
 import com.trojan.loginserver.exception.DatabaseException;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
+import com.trojan.loginserver.model.MfaStatus;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.model.UserProfile;
 import com.trojan.loginserver.repository.UserRepository;
@@ -37,7 +38,7 @@ public class UserService {
         logger.debug("Registering user with email: {}", email);
         String encodedPassword = passwordEncoder.encode(password);
         try {
-            userRepository.save(new User(email, encodedPassword, userName, Provider));
+            userRepository.save(new User(email, encodedPassword, userName, Provider, false, MfaStatus.FALSE));
             logger.info("User registered successfully with email: {}", email);
         } catch (Exception e) {
             logger.error("Error saving user to database for email: {}", email, e);
@@ -81,19 +82,19 @@ public class UserService {
             return existingUser.get().getUserProfile();
         }
         try {
-            return userRepository.save(new User(email, null, userName, provider)).getUserProfile();
+            return userRepository.save(new User(email, null, userName, provider, true, MfaStatus.DISABLED)).getUserProfile();
         } catch (Exception e) {
             logger.error("Error saving OAuth user to database for email: {}", email, e);
             throw new DatabaseException("Error saving OAuth user to database");
         }
     }
 
-    public String getUserName(String email){
+    public UserProfile getUserName(String email){
         logger.debug("Fetching user profile for email: {}", email);
         Optional<User> user = userRepository.findByEmail(email);
         if(user.isPresent()){
             logger.info("User profile fetched successfully for email: {}", email);
-            return user.get().getUserName();
+            return user.get().getUserProfile();
         }
         logger.warn("User not found for fetching profile with email: {}", email);
         throw new ResourceNotFoundException("User Not Found");
