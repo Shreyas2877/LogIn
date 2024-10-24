@@ -122,4 +122,9 @@ public class AuthController {
         return ResponseEntity.ok(userService.saveOAuthUser(request.getEmail(), request.getUserName(), request.getProvider()));
     }
 
+    @PostMapping("/updateMfa")
+    public ResponseEntity<?> updateMfa(@RequestParam String email, @RequestParam MfaStatus mfaEnabled) {
+        userService.updateMfa(email, mfaEnabled);
+        return ResponseEntity.ok("MFA updated successfully");
+    }
 }

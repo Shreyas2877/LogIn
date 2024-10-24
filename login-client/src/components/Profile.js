@@ -93,6 +93,7 @@ const Profile = () => {
             <AnimatedSecuritySettings 
               emailVerified={profile.emailVerified} 
               mfaEnabled={profile.mfaEnabled} 
+              email={profile.email}
             /> 
           </>
         ) : (

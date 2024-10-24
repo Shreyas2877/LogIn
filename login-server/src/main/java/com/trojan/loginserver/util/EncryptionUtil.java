@@ -31,6 +31,7 @@ public class EncryptionUtil {
     }
 
     public String decrypt(String encryptedData) throws Exception {
+        System.out.println("Key: " + encryptedData);
         Cipher cipher = Cipher.getInstance(ALGORITHM);
         cipher.init(Cipher.DECRYPT_MODE, secretKey);
         byte[] decodedData = Base64.getDecoder().decode(encryptedData);

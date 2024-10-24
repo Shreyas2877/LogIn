@@ -62,10 +62,6 @@ const Login = () => {
     const result = await loginController(email, password);
     if (result.success) {
       setHasLoggedIn(true);
-
-      // Send OTP email
-      
-
       // Check if JWT token is present in cookies
       const token = Cookies.get("jwt");
       if (token) {

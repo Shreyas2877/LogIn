@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
-import { makeStyles } from '@material-ui/core/styles';
-import { Box, Button, CardContent, Switch, Typography } from '@material-ui/core';
-import CheckCircleIcon from '@material-ui/icons/CheckCircle';
-import StyledCard from './StyledCard';
-import StyledHr from './StyledHr';
+import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import {
+  Box,
+  Button,
+  CardContent,
+  Switch,
+  Typography,
+} from "@material-ui/core";
+import CheckCircleIcon from "@material-ui/icons/CheckCircle";
+import Alert from "@mui/lab/Alert";
+import StyledCard from "./StyledCard";
+import StyledHr from "./StyledHr";
+import { sendVerificationEmail, updateMfa } from "../controllers/authController";
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -13,59 +21,114 @@ const useStyles = makeStyles((theme) => ({
     color: theme.palette.secondary.main,
   },
   body: {
-    color: '#696969',
+    color: "#696969",
   },
   button: {
-    marginTop: '10px',
+    marginTop: "10px",
   },
   verifiedText: {
-    color: 'green',
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: '0.875rem',
-    marginLeft: '10px',
+    color: "green",
+    display: "flex",
+    alignItems: "center",
+    fontSize: "0.875rem",
+    marginLeft: "10px",
   },
   icon: {
-    marginLeft: '5px',
+    marginLeft: "5px",
   },
   disabledText: {
-    color: 'grey',
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: '0.875rem',
-    marginLeft: '10px',
+    color: "grey",
+    display: "flex",
+    alignItems: "center",
+    fontSize: "0.875rem",
+    marginLeft: "10px",
   },
 }));
 
-const SecuritySettings = ({ emailVerified, mfaEnabled }) => {
+const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
   const classes = useStyles();
   const [isChanged, setIsChanged] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertSeverity, setAlertSeverity] = useState("success");
+  const [isVerifyEmailDisabled, setIsVerifyEmailDisabled] = useState(false);
+  const [isMfaEnabled, setIsMfaEnabled] = useState(mfaEnabled === "TRUE");
+  const [initialMfaEnabled] = useState(mfaEnabled === "TRUE"); // Track the initial state of MFA
+
+  useEffect(() => {
+    // Check if there's a change in the MFA status compared to the initial value
+    if (isMfaEnabled !== initialMfaEnabled) {
+      setIsChanged(true);
+    } else {
+      setIsChanged(false);
+    }
+  }, [isMfaEnabled, initialMfaEnabled]);
+
 
   const handleInteraction = () => {
     setIsChanged(true);
+  };
+
+  const handleVerifyEmail = async () => {
+    handleInteraction();
+    setIsVerifyEmailDisabled(true);
+    try {
+      const response = await sendVerificationEmail(email);
+      setAlertMessage(response.data);
+      setAlertSeverity("success");
+    } catch (error) {
+      setAlertMessage(error.message || "Failed to send verification email");
+      setAlertSeverity("error");
+    }
+    setTimeout(() => {
+      setIsVerifyEmailDisabled(false);
+    }, 10000); // Re-enable the button after 10 seconds
+  };
+
+  const handleUpdateProfile = async () => {
+    const mfaStatus = isMfaEnabled ? 'TRUE' : 'FALSE';
+    const result = await updateMfa(email, mfaStatus);
+    if (result.success) {
+      console.log('MFA status updated successfully');
+    } else {
+      console.error(`Error updating MFA status: ${result.message}`);
+    }
+  };
+
+  const handleMfaChange = (event) => {
+    setIsMfaEnabled(event.target.checked);
+    handleInteraction();
   };
 
   return (
     <StyledCard>
       <CardContent>
         <Box mb={3}>
-          <Typography variant="h6" className={classes.title}>Security Settings</Typography>
+          <Typography variant="h6" className={classes.title}>
+            Security Settings
+          </Typography>
         </Box>
+        {alertMessage && (
+          <Alert severity={alertSeverity} onClose={() => setAlertMessage("")}>
+            {alertMessage}
+          </Alert>
+        )}
         <Box mt={3} mb={3}>
-          <Typography variant="subtitle1" className={classes.subtitle}>Verify Email</Typography>
+          <Typography variant="subtitle1" className={classes.subtitle}>
+            Verify Email
+          </Typography>
           <Typography variant="body2" className={classes.body}>
             Unlock security features for this account by verifying your email.
           </Typography>
-          <Button 
-            variant="contained" 
-            color="primary" 
+          <Button
+            variant="contained"
+            color="primary"
             className={classes.button}
-            disabled={emailVerified === "TRUE"}
-            onClick={handleInteraction}
+            disabled={emailVerified || isVerifyEmailDisabled}
+            onClick={handleVerifyEmail}
           >
             Verify Email
           </Button>
-          {emailVerified === "TRUE" && (
+          {emailVerified && (
             <Typography className={classes.verifiedText}>
               Verified <CheckCircleIcon className={classes.icon} />
             </Typography>
@@ -73,9 +136,11 @@ const SecuritySettings = ({ emailVerified, mfaEnabled }) => {
         </Box>
         <StyledHr />
         <Box mt={3} mb={3}>
-          <Typography variant="subtitle1" className={classes.subtitle}>Enable MFA</Typography>
+          <Typography variant="subtitle1" className={classes.subtitle}>
+            Enable MFA
+          </Typography>
           <Typography variant="body2" className={classes.body}>
-            MFA for your profile for step-up authentication.
+            Enable MFA in your profile for step-up authentications.
           </Typography>
           {mfaEnabled === "DISABLED" ? (
             <Typography className={classes.disabledText}>
@@ -83,15 +148,21 @@ const SecuritySettings = ({ emailVerified, mfaEnabled }) => {
             </Typography>
           ) : (
             <>
-              <Typography component="div" style={{ marginTop: '10px' }}>
+              <Typography component="div" style={{ marginTop: "10px" }}>
                 Enable MFA
-                <Switch 
-                  color="primary" 
-                  checked={mfaEnabled === "TRUE"} 
-                  onChange={handleInteraction}
+                <Switch
+                  color="primary"
+                  checked={isMfaEnabled}
+                  onChange={handleMfaChange}
+                  disabled={!emailVerified}
                 />
               </Typography>
-              {mfaEnabled === "TRUE" && (
+              {!emailVerified && (
+                <Typography className={classes.disabledText}>
+                  Verify email to enable MFA
+                </Typography>
+              )}
+              {isMfaEnabled && emailVerified && (
                 <Typography className={classes.verifiedText}>
                   MFA Enabled <CheckCircleIcon className={classes.icon} />
                 </Typography>
@@ -101,10 +172,11 @@ const SecuritySettings = ({ emailVerified, mfaEnabled }) => {
         </Box>
         <StyledHr />
         <Box mt={3}>
-          <Button 
-            variant="contained" 
-            color="secondary" 
+          <Button
+            variant="contained"
+            color="secondary"
             disabled={!isChanged}
+            onClick={handleUpdateProfile}
           >
             Update Profile
           </Button>

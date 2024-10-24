@@ -28,3 +28,15 @@ export const sendEmail = (email) => {
 export const verifyOtp = (email, otp) => {
     return axiosInstance.post('/email/validate?email='+email+'&otp='+otp);
 };
+
+export const sendVerEmail = (email) => {
+    return axiosInstance.post('/email/sendVerificationEmail?email='+email);
+}
+
+export const verifyEmailToken = (token) => {
+    return axiosInstance.get('/email/validateVerificationToken?token='+token);
+}
+
+export const updateMfaStatus = (email, mfaStatus) => {
+    return axiosInstance.post('/auth/updateMfa?email='+email+'&mfaEnabled='+mfaStatus);
+}

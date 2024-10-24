@@ -118,4 +118,17 @@ public class UserService {
         logger.warn("User not found with email: {}", email);
         throw new ResourceNotFoundException("User Not Found");
     }
+
+    public void updateMfa(String email, MfaStatus mfaEnabled) {
+        logger.debug("Updating MFA status for user with email: {}", email);
+        Optional<User> user = userRepository.findByEmail(email);
+        user.ifPresentOrElse(u -> {
+            u.setMfaEnabled(mfaEnabled);
+            userRepository.save(u);
+            logger.info("MFA status updated successfully for user with email: {}", email);
+        }, () -> {
+            logger.warn("User not found for updating MFA status with email: {}", email);
+            throw new ResourceNotFoundException("User Not Found");
+        });
+    }
 }
