@@ -9,9 +9,11 @@ import com.trojan.loginserver.model.MfaStatus;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.model.UserProfile;
 import com.trojan.loginserver.service.CookieService;
+import com.trojan.loginserver.service.EmailService;
 import com.trojan.loginserver.service.JwtService;
 import com.trojan.loginserver.service.UserService;
 import io.jsonwebtoken.Claims;
+import jakarta.mail.MessagingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import jakarta.servlet.http.Cookie;
@@ -38,6 +40,9 @@ public class AuthController {
 
     @Autowired
     private CookieService cookieService;
+
+    @Autowired
+    private EmailService emailService;
 
     @PostMapping("/signup")
     public ResponseEntity<?> signup(@RequestBody SignupRequest signupRequest) {
@@ -110,10 +115,12 @@ public class AuthController {
     }
 
     @PostMapping("/deregister")
-    public ResponseEntity<?> deregister(@RequestBody User user) {
-        logger.debug("Deregister request received for email: {}", user.getEmail());
-        userService.deregisterUser(user.getEmail());
-        logger.info("User deregistered successfully: {}", user.getEmail());
+    public ResponseEntity<?> deregister(@RequestParam String email, HttpServletResponse response) throws MessagingException {
+        logger.debug("Deregister request received for email: {}", email);
+        emailService.deregisterUser(email);
+        Cookie cookie = cookieService.deleteCookie("jwt");
+        response.addCookie(cookie);
+        logger.info("User deregistered successfully: {}", email);
         return ResponseEntity.ok("User deregistered successfully");
     }
 

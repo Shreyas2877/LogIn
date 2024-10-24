@@ -7,6 +7,7 @@ import com.trojan.loginserver.model.MfaStatus;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.model.UserProfile;
 import com.trojan.loginserver.repository.UserRepository;
+import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
@@ -64,20 +65,13 @@ public class UserService {
         throw new ResourceNotFoundException("User not found");
     }
 
-    public void deregisterUser(String email) {
-        logger.debug("Deregistering user with email: {}", email);
-        Optional<User> user = userRepository.findByEmail(email);
-        user.ifPresentOrElse(userRepository::delete, () -> {
-            logger.warn("User not found for deregistration with email: {}", email);
-            throw new ResourceNotFoundException("User Not Found");
-        });
-        logger.info("User deregistered successfully with email: {}", email);
-    }
-
     public UserProfile saveOAuthUser(String email, String userName, String provider) {
         logger.debug("Saving OAuth user with email: {}", email);
         Optional<User> existingUser = userRepository.findByEmail(email);
         if (existingUser.isPresent()) {
+            User user = existingUser.get();
+            user.setEmailVerified(true);
+            userRepository.save(user);
             logger.info("User already exists with email: {}", email);
             return existingUser.get().getUserProfile();
         }

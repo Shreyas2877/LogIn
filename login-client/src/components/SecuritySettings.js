@@ -1,17 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
   CardContent,
   Switch,
-  Typography,
+  Typography
 } from "@material-ui/core";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import Alert from "@mui/lab/Alert";
 import StyledCard from "./StyledCard";
 import StyledHr from "./StyledHr";
-import { sendVerificationEmail, updateMfa } from "../controllers/authController";
+import { sendVerificationEmail, updateMfa, deleteUser } from "../controllers/authController";
+import DeleteProfileCard from "./DeleteProfileCard";
+import Cookies from 'js-cookie';
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -27,32 +30,37 @@ const useStyles = makeStyles((theme) => ({
     marginTop: "10px",
   },
   verifiedText: {
-    color: "green",
-    display: "flex",
-    alignItems: "center",
-    fontSize: "0.875rem",
-    marginLeft: "10px",
+    color: theme.palette.success.main,
+  },
+  disabledText: {
+    color: theme.palette.error.main,
   },
   icon: {
     marginLeft: "5px",
   },
-  disabledText: {
-    color: "grey",
-    display: "flex",
-    alignItems: "center",
-    fontSize: "0.875rem",
-    marginLeft: "10px",
+  deleteButton: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.common.white,
+    '&:hover': {
+      backgroundColor: theme.palette.error.dark,
+    },
+  },
+  centerBox: {
+    display: 'flex',
+    justifyContent: 'center',
   },
 }));
 
 const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
   const classes = useStyles();
+  const navigate = useNavigate();
   const [isChanged, setIsChanged] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success");
   const [isVerifyEmailDisabled, setIsVerifyEmailDisabled] = useState(false);
   const [isMfaEnabled, setIsMfaEnabled] = useState(mfaEnabled === "TRUE");
   const [initialMfaEnabled] = useState(mfaEnabled === "TRUE"); // Track the initial state of MFA
+  const [enteredEmail, setEnteredEmail] = useState('');
 
   useEffect(() => {
     // Check if there's a change in the MFA status compared to the initial value
@@ -68,8 +76,11 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
     setIsChanged(true);
   };
 
+  const handleEmailChange = (event) => {
+    setEnteredEmail(event.target.value);
+  };
+
   const handleVerifyEmail = async () => {
-    handleInteraction();
     setIsVerifyEmailDisabled(true);
     try {
       const response = await sendVerificationEmail(email);
@@ -99,7 +110,15 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
     handleInteraction();
   };
 
+  const handleDeleteProfile = () => {
+    deleteUser(email);
+    console.log('Delete profile clicked');
+    Cookies.remove('jwt');
+    navigate('/login');
+  };
+
   return (
+    <>
     <StyledCard>
       <CardContent>
         <Box mb={3}>
@@ -183,6 +202,20 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
         </Box>
       </CardContent>
     </StyledCard>
+    <StyledCard>
+        <CardContent>
+          <Box>
+          <DeleteProfileCard
+            classes={classes}
+            enteredEmail={enteredEmail}
+            email={email}
+            handleEmailChange={handleEmailChange}
+            handleDeleteProfile={handleDeleteProfile}
+          />
+          </Box>
+        </CardContent>
+      </StyledCard>
+      </>
   );
 };
 

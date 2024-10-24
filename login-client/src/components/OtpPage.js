@@ -106,7 +106,7 @@ const OtpPage = () => {
               }}
             >
               <TextField
-                label="OTP Goes here..."
+                placeholder={"OTP Goes here..."}
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 fullWidth

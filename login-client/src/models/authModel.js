@@ -10,7 +10,7 @@ export const signup = (email, password, userName) => {
 };
 
 export const deregister = (email) => {
-    return axiosInstance.post('/auth/deregister', { email });
+    return axiosInstance.post('/auth/deregister?email='+email);
 };
 
 export const fetchProfile = () => {
