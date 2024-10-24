@@ -5,6 +5,7 @@ import com.trojan.loginserver.dto.OAuthRequest;
 import com.trojan.loginserver.dto.SignupRequest;
 import com.trojan.loginserver.dto.LoginRequest;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
+import com.trojan.loginserver.model.MfaStatus;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.model.UserProfile;
 import com.trojan.loginserver.service.CookieService;
@@ -55,11 +56,11 @@ public class AuthController {
         logger.debug("Login request received for email: {}", loginRequest.getEmail());
         Optional<User> existingUser = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
         if (existingUser.isPresent()) {
-            User loggedInUser = existingUser.get();
-            String token = jwtService.generateToken(loggedInUser.getEmail(), loggedInUser.getId());
-
-            Cookie cookie = cookieService.createCookie("jwt", token, 86400); // 1 day in seconds
-            response.addCookie(cookie);
+            //set this if enable MFA is present in properties
+            User currentUser = existingUser.get();
+            if(!currentUser.getMfaEnabled().equals(MfaStatus.TRUE)){
+                userService.setJwt(response, existingUser);
+            }
 
             logger.info("Login successful for email: {}", loginRequest.getEmail());
             return ResponseEntity.ok("Login successful");
@@ -91,9 +92,9 @@ public class AuthController {
             String email = claims.getSubject();
             Long id = claims.get("id", Long.class);
             //retrieve user profile from database
-            String userName = userService.getUserName(email);
+            UserProfile userProfile = userService.getUserName(email);
             logger.debug("Profile request for email: {}", email);
-            return ResponseEntity.ok(new UserProfile(email, id, userName));
+            return ResponseEntity.ok(userProfile);
         } catch (Exception e) {
             logger.error("Invalid token", e);
             return ResponseEntity.status(401).body("Invalid token");
@@ -121,4 +122,9 @@ public class AuthController {
         return ResponseEntity.ok(userService.saveOAuthUser(request.getEmail(), request.getUserName(), request.getProvider()));
     }
 
+    @PostMapping("/updateMfa")
+    public ResponseEntity<?> updateMfa(@RequestParam String email, @RequestParam MfaStatus mfaEnabled) {
+        userService.updateMfa(email, mfaEnabled);
+        return ResponseEntity.ok("MFA updated successfully");
+    }
 }

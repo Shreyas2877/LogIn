@@ -1,12 +1,18 @@
-import React from 'react';
+import React,{ useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { signupController } from '../controllers/authController';
 import { Container, TextField, Button, Typography, Box, Alert } from '@mui/material';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import Cookies from 'js-cookie';
 
 const Signup = () => {
     const navigate = useNavigate();
+
+    useEffect(() => {
+        //clear jwt cookie
+        Cookies.remove('jwt');
+    });
 
     const validationSchema = Yup.object({
         userName: Yup.string().required('Required'),
