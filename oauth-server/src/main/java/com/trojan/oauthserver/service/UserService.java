@@ -1,6 +1,12 @@
 // src/main/java/com/trojan/oauthserver/service/UserService.java
 package com.trojan.oauthserver.service;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -15,12 +21,16 @@ import java.util.Map;
 @Service
 public class UserService {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     public Map<String, Object> saveUser(String email, String userName, String provider) {
         // Prepare the request body
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("email", email);
         requestBody.put("userName", userName);
         requestBody.put("provider", provider);
+
+        logger.info("Sending payload: {}", requestBody);
 
         // Make the HTTP POST request to save the user
         RestTemplate restTemplate = new RestTemplate();

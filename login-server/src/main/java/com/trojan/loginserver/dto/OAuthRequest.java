@@ -1,6 +1,10 @@
 // src/main/java/com/trojan/loginserver/dto/OAuthRequest.java
 package com.trojan.loginserver.dto;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 public class OAuthRequest {
 
     private String email;

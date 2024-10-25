@@ -4,15 +4,27 @@ package com.trojan.loginserver.service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 @Service
 public class JwtService {
 
-    private static final String SECRET_KEY = "your_secret_key";
     private static final long EXPIRATION_TIME = 86400000; // 1 day in milliseconds
+
+    @Autowired
+    private Environment env;
+
+    private String getSecretKey() {
+        return env.getProperty("jwt.secret");
+    }
 
     public String generateToken(String email, Long id) {
         return Jwts.builder()
@@ -20,13 +32,13 @@ public class JwtService {
                 .claim("id", id)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS512, getSecretKey())
                 .compact();
     }
 
     public Claims validateToken(String token) {
         return Jwts.parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(getSecretKey())
                 .parseClaimsJws(token)
                 .getBody();
     }

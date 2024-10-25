@@ -6,6 +6,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 
 import java.util.Date;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 public class JwtUtil {
 
     private static final String SECRET_KEY = "your_secret_key";

@@ -1,6 +1,10 @@
 // src/main/java/com/trojan/loginserver/dto/LoginRequest.java
 package com.trojan.loginserver.dto;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 public class LoginRequest {
     private String email;
     private String password;
