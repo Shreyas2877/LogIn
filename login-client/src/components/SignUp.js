@@ -7,20 +7,22 @@ import {
   Button,
   Typography,
   Box,
-  Alert
+  Alert,
+  Card,
+  CardContent,
 } from "@mui/material";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import Cookies from "js-cookie";
-
+import StyledHr from "./StyledHr";
 
 const Signup = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    //clear jwt cookie
+    // Clear JWT cookie
     Cookies.remove("jwt");
-  });
+  }, []);
 
   const validationSchema = Yup.object({
     userName: Yup.string().required("Required"),
@@ -46,27 +48,52 @@ const Signup = () => {
       if (result.statusCode === 400) {
         setErrors({ general: result.message || "User doesn't exist" });
       } else {
-        setErrors({ general: "An Unexpected error occurred, Try again!" });
+        setErrors({ general: "An unexpected error occurred, try again!" });
       }
     }
   };
 
   return (
     <Container maxWidth="sm">
-      <Box mt={5}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Sign Up
+      <Box mt={5} mb={5} textAlign="center">
+        <Typography
+          variant="h4"
+          component="h1"
+          gutterBottom
+          color="#3f51b5"
+          fontWeight="bold"
+        >
+          Join the TrojApp Community!
+        </Typography>
+        <Typography
+          variant="subtitle1"
+          component="h2"
+          color="textSecondary"
+          gutterBottom
+        >
+          Your gateway to a smarter, more organized life.
+        </Typography>
+      </Box>
+      <Box>
+        <Card elevation={10} sx={{ borderRadius: "16px", boxShadow: "0 4px 20px rgba(0,0,0,0.1)" }}>
+          <CardContent>
+            <Typography variant="h5" component="h2" align="center" gutterBottom color="#3f51b5">
+              Create Your Account
             </Typography>
+            <StyledHr />
             <Formik
-              initialValues={{ userName: "", email: "", password: "" }}
+              initialValues={{
+                userName: "",
+                email: "",
+                password: "",
+                confirmPassword: "",
+              }}
               validationSchema={validationSchema}
               onSubmit={handleSubmit}
             >
               {({ isSubmitting, errors }) => (
                 <Form>
-                  {errors.general && (
-                    <Alert severity="error">{errors.general}</Alert>
-                  )}
+                  {errors.general && <Alert severity="error">{errors.general}</Alert>}
                   <Field
                     as={TextField}
                     name="userName"
@@ -74,8 +101,24 @@ const Signup = () => {
                     type="text"
                     fullWidth
                     margin="normal"
+                    variant="outlined"
                     helperText={<ErrorMessage name="userName" />}
                     error={Boolean(errors.userName)}
+                    sx={{
+                      borderRadius: "8px",
+                      bgcolor: "#f5f5f5",
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                      },
+                    }}
                   />
                   <Field
                     as={TextField}
@@ -84,8 +127,24 @@ const Signup = () => {
                     type="email"
                     fullWidth
                     margin="normal"
+                    variant="outlined"
                     helperText={<ErrorMessage name="email" />}
                     error={Boolean(errors.email)}
+                    sx={{
+                      borderRadius: "8px",
+                      bgcolor: "#f5f5f5",
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                      },
+                    }}
                   />
                   <Field
                     as={TextField}
@@ -94,8 +153,24 @@ const Signup = () => {
                     type="password"
                     fullWidth
                     margin="normal"
+                    variant="outlined"
                     helperText={<ErrorMessage name="password" />}
                     error={Boolean(errors.password)}
+                    sx={{
+                      borderRadius: "8px",
+                      bgcolor: "#f5f5f5",
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                      },
+                    }}
                   />
                   <Field
                     as={TextField}
@@ -104,21 +179,55 @@ const Signup = () => {
                     type="password"
                     fullWidth
                     margin="normal"
+                    variant="outlined"
                     helperText={<ErrorMessage name="confirmPassword" />}
                     error={Boolean(errors.confirmPassword)}
+                    sx={{
+                      borderRadius: "8px",
+                      bgcolor: "#f5f5f5",
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&:hover fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                        "&.Mui-focused fieldset": {
+                          borderColor: "#3f51b5",
+                        },
+                      },
+                    }}
                   />
+                  <StyledHr />
                   <Button
                     type="submit"
                     fullWidth
                     variant="contained"
                     color="primary"
                     disabled={isSubmitting}
+                    sx={{
+                      mt: 2,
+                      borderRadius: "8px",
+                      bgcolor: "#3f51b5",
+                      padding: "10px",
+                      "&:hover": {
+                        bgcolor: "#303f9f",
+                      },
+                    }}
                   >
                     Sign Up
                   </Button>
+                  <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 2 }}>
+                    Already have an account?{" "}
+                    <Button color="primary" onClick={() => navigate("/login")}>
+                      Log in
+                    </Button>
+                  </Typography>
                 </Form>
               )}
             </Formik>
+          </CardContent>
+        </Card>
       </Box>
     </Container>
   );

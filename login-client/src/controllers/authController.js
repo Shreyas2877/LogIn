@@ -1,5 +1,5 @@
 // src/controllers/authController.js
-import { login, signup, deregister, fetchProfile, logout, sendEmail, verifyOtp, sendVerEmail, verifyEmailToken, updateMfaStatus } from '../models/authModel';
+import { login, signup, deregister, fetchProfile, logout, sendEmail, verifyOtp, sendVerEmail, verifyEmailToken, updateMfaStatus, sendPasswordRestEmail, resetPassword } from '../models/authModel';
 
 export const loginController = async (email, password) => {
     try {
@@ -98,5 +98,25 @@ export const deleteUser = async (email) => {
     } catch (error) {
         console.log("Error Caught : %s", error.message);
         return { success: false, statusCode: error.response.status, message: error.response?.data?.message || 'Delete user error' };
+    }
+};
+
+export const sendResetPasswordEmail = async (email) => {
+    try {
+        const response = await sendPasswordRestEmail(email);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.log("Error Caught : %s", error.message);
+        return { success: false, statusCode: error.response.status, message: error.response?.data?.message || 'Failed to send reset password email' };
+    }
+};
+
+export const resetPasswordController = async (email, password) => {
+    try {
+        const response = await resetPassword(email, password);
+        return { success: true, data: response.data };
+    } catch (error) {
+        console.log("Error Caught : %s", error.message);
+        return { success: false, statusCode: error.response.status, message: error.response?.data?.message || 'Reset password error' };
     }
 };

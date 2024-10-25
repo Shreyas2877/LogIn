@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LoginContext } from "../context/LoginContext";
-import { validateOtp } from "../controllers/authController";
+import { validateOtp, sendEmailController } from "../controllers/authController"; // Make sure resendOtp is implemented in authController
 import {
   Container,
   Box,
@@ -11,12 +11,15 @@ import {
   Alert,
   Card,
   CardContent,
+  Link,
 } from "@mui/material";
 import Cookies from "js-cookie";
 
 const OtpPage = () => {
   const [otp, setOtp] = useState("");
   const [error, setError] = useState("");
+  const [timer, setTimer] = useState(30); // Timer state
+  const [isResendDisabled, setIsResendDisabled] = useState(true); // Resend link state
   const navigate = useNavigate();
   const location = useLocation();
   const { hasLoggedIn } = useContext(LoginContext);
@@ -24,7 +27,6 @@ const OtpPage = () => {
   const email = location.state?.email;
 
   useEffect(() => {
-    // Check if JWT token is present in cookies
     const token = Cookies.get("jwt");
     if (token) {
       navigate("/profile");
@@ -36,6 +38,16 @@ const OtpPage = () => {
       navigate("/login");
     }
   }, [hasLoggedIn, navigate]);
+
+  // Timer countdown
+  useEffect(() => {
+    if (timer > 0) {
+      const countdown = setTimeout(() => setTimer(timer - 1), 1000);
+      return () => clearTimeout(countdown);
+    } else {
+      setIsResendDisabled(false);
+    }
+  }, [timer]);
 
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
@@ -60,6 +72,21 @@ const OtpPage = () => {
     }
   };
 
+  const handleResendOtp = async () => {
+    setTimer(30);
+    setIsResendDisabled(true);
+    setError("");
+
+    // Call the resendOtp function to send a new OTP
+    try {
+          await sendEmailController(email);
+        } catch (error) {
+          console.error("Failed to send OTP email:", error);
+          setError("Failed to send OTP email");
+          return;
+        }
+  };
+
   return (
     <Container
       maxWidth="sm"
@@ -70,32 +97,38 @@ const OtpPage = () => {
         minHeight: "100vh",
       }}
     >
-      <Box mt={5} sx={{ mt: -2 }}>
+      <Box mt={5}>
         <Card
           sx={{
             borderRadius: 2,
             boxShadow: 3,
             py: 4,
-            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            backgroundColor: "rgba(255, 255, 255, 0.9)",
             backdropFilter: "blur(10px)",
           }}
         >
-          <CardContent sx={{ textAlign: "center", color: "white" }}>
+          <CardContent sx={{ textAlign: "center" }}>
             <Typography
               variant="h4"
               component="h1"
               gutterBottom
-              sx={{ fontWeight: "bold", color: "white" }}
+              sx={{
+                fontWeight: "bold",
+                color: "#3f51b5",
+              }}
             >
               Verify OTP
             </Typography>
             <Typography
               variant="body1"
               gutterBottom
-              sx={{ fontSize: "16px", color: "white" }}
+              sx={{
+                fontSize: "16px",
+                color: "#555555",
+              }}
             >
               We have sent a verification code to your registered email address:{" "}
-              {email}
+              <strong>{email}</strong>
             </Typography>
             <form
               onSubmit={handleOtpSubmit}
@@ -106,7 +139,7 @@ const OtpPage = () => {
               }}
             >
               <TextField
-                placeholder={"OTP Goes here..."}
+                placeholder="Enter OTP..."
                 value={otp}
                 onChange={(e) => setOtp(e.target.value)}
                 fullWidth
@@ -117,16 +150,16 @@ const OtpPage = () => {
                   borderRadius: 1,
                 }}
                 InputProps={{
-                  style: { color: "#000" }, // Set the text color to black
+                  style: { color: "#000" },
                 }}
                 InputLabelProps={{
-                  style: { color: "#000" }, // Set the placeholder color to black
+                  style: { color: "#000" },
                 }}
               />
               {error && (
                 <Alert
                   severity="error"
-                  sx={{ maxWidth: "300px", width: "100%" }}
+                  sx={{ maxWidth: "300px", width: "100%", mt: 1 }}
                 >
                   {error}
                 </Alert>
@@ -136,11 +169,31 @@ const OtpPage = () => {
                 variant="contained"
                 color="primary"
                 fullWidth
-                sx={{ maxWidth: "300px", mt: 2 }}
+                sx={{
+                  maxWidth: "300px",
+                  mt: 2,
+                  borderRadius: "8px",
+                  bgcolor: "#3f51b5",
+                  "&:hover": {
+                    bgcolor: "#303f9f",
+                  },
+                }}
               >
                 Submit
               </Button>
             </form>
+            <Typography
+              variant="body2"
+              sx={{ mt: 2, color: "#3f51b5", fontWeight: "bold" }}
+            >
+              {isResendDisabled ? (
+                `Resend OTP in ${timer}s`
+              ) : (
+                <Link href="#" onClick={handleResendOtp}>
+                  Resend OTP
+                </Link>
+              )}
+            </Typography>
           </CardContent>
         </Card>
       </Box>

@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, createTheme } from '@material-ui/core';
 import NavBar from './components/NavBar';
-import AppRoutes from './routes';
+import AppRoutes from './routes/index';
 import Background from './styles/Background'; // Import the Background component
 
 const darkTheme = createTheme({

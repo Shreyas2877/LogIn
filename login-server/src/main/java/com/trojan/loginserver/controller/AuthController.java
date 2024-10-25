@@ -6,7 +6,6 @@ import com.trojan.loginserver.dto.SignupRequest;
 import com.trojan.loginserver.dto.LoginRequest;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
 import com.trojan.loginserver.model.MfaStatus;
-import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.model.UserProfile;
 import com.trojan.loginserver.service.CookieService;
 import com.trojan.loginserver.service.EmailService;
@@ -57,21 +56,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<UserProfile> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         logger.debug("Login request received for email: {}", loginRequest.getEmail());
-        Optional<User> existingUser = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
-        if (existingUser.isPresent()) {
-            //set this if enable MFA is present in properties
-            User currentUser = existingUser.get();
-            if(!currentUser.getMfaEnabled().equals(MfaStatus.TRUE)){
-                userService.setJwt(response, existingUser);
-            }
-
-            logger.info("Login successful for email: {}", loginRequest.getEmail());
-            return ResponseEntity.ok("Login successful");
-        }
-        logger.warn("Invalid login attempt for email: {}", loginRequest.getEmail());
-        return ResponseEntity.status(401).body("Invalid email or password");
+        UserProfile userProfile = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword(), response);
+        logger.info("Login successful for email: {}", loginRequest.getEmail());
+        return ResponseEntity.ok(userProfile);
     }
 
     @GetMapping("/profile")
@@ -102,7 +91,7 @@ public class AuthController {
             return ResponseEntity.ok(userProfile);
         } catch (Exception e) {
             logger.error("Invalid token", e);
-            return ResponseEntity.status(401).body("Invalid token");
+            return ResponseEntity.status(401).body("Unauthorized");
         }
     }
 
@@ -133,5 +122,11 @@ public class AuthController {
     public ResponseEntity<?> updateMfa(@RequestParam String email, @RequestParam MfaStatus mfaEnabled) {
         userService.updateMfa(email, mfaEnabled);
         return ResponseEntity.ok("MFA updated successfully");
+    }
+
+    @PostMapping("/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestParam String email, @RequestParam String password) {
+        userService.updatePassword(email, password);
+        return ResponseEntity.ok("Password updated successfully");
     }
 }

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
-import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -53,7 +52,6 @@ const useStyles = makeStyles((theme) => ({
 
 const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
   const classes = useStyles();
-  const navigate = useNavigate();
   const [isChanged, setIsChanged] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success");
@@ -114,7 +112,6 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
     deleteUser(email);
     console.log('Delete profile clicked');
     Cookies.remove('jwt');
-    navigate('/login');
   };
 
   return (

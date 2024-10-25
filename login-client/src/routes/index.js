@@ -8,6 +8,8 @@ import Profile from '../components/Profile.js';
 import OtpPage from '../components/OtpPage.js';
 import VerifyEmail from '../components/VerifyEmail.js';
 import { LoginProvider } from '../context/LoginContext.js';
+import ForgotPassword from '../components/ForgotPassword.js';
+import ResetPassword from '../components/ResetPassword.js';
 
 const AppRoutes = () => (
     <LoginProvider>
@@ -17,6 +19,8 @@ const AppRoutes = () => (
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/forgot-password" element={<ForgotPassword />}/>
+        <Route path="/reset-password" element={<ResetPassword />}/>
         <Route path="/" element={<Home />} />
     </Routes>
     </LoginProvider>

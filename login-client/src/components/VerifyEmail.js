@@ -1,42 +1,24 @@
 import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { Typography, CardContent, Container } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
+import { Typography, CardContent, Container } from '@mui/material';
 import StyledCard from './StyledCard';
 import { verifyEmail } from '../controllers/authController'; // Adjust the import path as necessary
 import { useNavigate } from 'react-router-dom';
-import Cookies from 'js-cookie';
-
-const useStyles = makeStyles((theme) => ({
-  title: {
-    color: theme.palette.primary.main,
-    textAlign: 'center',
-    marginTop: theme.spacing(4),
-  },
-  body: {
-    color: '#696969',
-    textAlign: 'center',
-    marginTop: theme.spacing(2),
-  },
-}));
 
 const VerifyEmail = () => {
-  const classes = useStyles();
-  const location = useLocation();
   const [message, setMessage] = useState('Validating your email...');
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
-    // Check if JWT token is present in cookies
-    const token = Cookies.get("jwt");
+    const queryParams = new URLSearchParams(location.search);
+    const token = queryParams.get('token');
     if (!token) {
-      navigate("/login");
-    }
-  }, [navigate]);
+      navigate('/login');
+      return;
+    }});
 
   useEffect(() => {
-    console.log('Navigated to verify-email page');
-
     const queryParams = new URLSearchParams(location.search);
     const token = queryParams.get('token');
 
@@ -54,15 +36,47 @@ const VerifyEmail = () => {
           setMessage('Validation error. Please try later.');
         });
     } else {
-      setMessage('Invalid token. Please try later.');
+      setMessage('Invalid libk or the link has expired. Please try later.');
     }
   }, [location]);
 
   return (
-    <Container>
-      <StyledCard>
-        <CardContent>
-          <Typography variant="h5" className={classes.title}>
+    <Container
+      maxWidth="sm"
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        minHeight: '100vh',
+      }}
+    >
+      <StyledCard
+        sx={{
+          borderRadius: 2,
+          boxShadow: 3,
+          py: 4,
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
+        }}
+      >
+        <CardContent sx={{ textAlign: 'center' }}>
+          <Typography
+            variant="h4"
+            component="h1"
+            gutterBottom
+            sx={{
+              fontWeight: 'bold',
+              color: '#3f51b5', // Primary color
+            }}
+          >
+            Verification
+          </Typography>
+          <Typography
+            variant="body1"
+            sx={{
+              fontSize: '16px',
+              color: '#555555', // Darker text color for readability
+            }}
+          >
             {message}
           </Typography>
         </CardContent>

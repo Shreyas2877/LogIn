@@ -63,4 +63,14 @@ public class EmailController {
             return new ResponseEntity<>("Failed to validate verification token", HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("/sendForgotPasswordEmail")
+    public ResponseEntity<String> sendForgotPasswordEmail(@RequestParam String email) {
+        try {
+            emailService.sendForgotPasswordEmail(email);
+            return new ResponseEntity<>("Forgot password email is sent to the email address : " + email, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("Failed to send forgot password email", HttpStatus.BAD_REQUEST);
+        }
+    }
 }
