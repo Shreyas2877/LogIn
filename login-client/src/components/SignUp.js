@@ -64,7 +64,7 @@ const Signup = () => {
           color="textSecondary"
           gutterBottom
         >
-          Your gateway to a smarter, more organized life.
+          Your gateway to a smarter, secure life.
         </Typography>
       </Box>
       <Box>

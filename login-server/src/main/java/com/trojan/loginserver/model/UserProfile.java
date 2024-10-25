@@ -1,6 +1,10 @@
 // src/main/java/com/trojan/loginserver/model/UserProfile.java
 package com.trojan.loginserver.model;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 public class UserProfile {
     private String email;
     private Long id;

@@ -12,6 +12,10 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 @Service
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 

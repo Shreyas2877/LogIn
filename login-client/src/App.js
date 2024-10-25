@@ -11,6 +11,21 @@ const darkTheme = createTheme({
     },
 });
 
+const Footer = () => (
+    <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        padding: '8px 16px', // Adjust padding for a better fit
+        color: 'white',
+        zIndex: 2,
+        fontSize: '0.8rem', // Smaller font size
+        textAlign: 'center', // Center align the text
+    }}>
+        © 2023 Shreyas - Troj Auth
+    </div>
+);
+
 const App = () => {
     return (
         <ThemeProvider theme={darkTheme}>
@@ -41,6 +56,7 @@ const App = () => {
                         </div>
                     </Router>
                 </div>
+                <Footer /> {/* Add the Footer component */}
             </div>
         </ThemeProvider>
     );

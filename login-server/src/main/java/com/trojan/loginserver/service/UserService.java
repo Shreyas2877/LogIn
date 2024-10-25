@@ -18,6 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 @Service
 public class UserService {
 
@@ -101,7 +105,7 @@ public class UserService {
         User loggedInUser = existingUser.get();
         String token = jwtService.generateToken(loggedInUser.getEmail(), loggedInUser.getId());
 
-        Cookie cookie = cookieService.createCookie("jwt", token, 86400); // 1 day in seconds
+        Cookie cookie = cookieService.createCookie("jwt_access", token, 86400); // 1 day in seconds
         response.addCookie(cookie);
     }
 

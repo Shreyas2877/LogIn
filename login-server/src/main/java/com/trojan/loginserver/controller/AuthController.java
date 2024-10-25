@@ -22,7 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+/*
+* @author: shreyas raviprakash
+* */
 
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController
@@ -97,7 +99,7 @@ public class AuthController {
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        Cookie cookie = cookieService.deleteCookie("jwt");
+        Cookie cookie = cookieService.deleteCookie("jwt_access");
         response.addCookie(cookie);
         logger.info("Logout successful");
         return ResponseEntity.ok("Logout successful");
@@ -107,7 +109,7 @@ public class AuthController {
     public ResponseEntity<?> deregister(@RequestParam String email, HttpServletResponse response) throws MessagingException {
         logger.debug("Deregister request received for email: {}", email);
         emailService.deregisterUser(email);
-        Cookie cookie = cookieService.deleteCookie("jwt");
+        Cookie cookie = cookieService.deleteCookie("jwt_access");
         response.addCookie(cookie);
         logger.info("User deregistered successfully: {}", email);
         return ResponseEntity.ok("User deregistered successfully");

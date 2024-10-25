@@ -1,6 +1,10 @@
 // src/main/java/com/trojan/loginserver/service/JwtService.java
 package com.trojan.oauthserver.service;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;

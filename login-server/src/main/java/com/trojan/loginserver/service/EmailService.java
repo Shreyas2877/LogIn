@@ -21,6 +21,10 @@ import java.util.Base64;
 import java.util.Optional;
 import java.util.Random;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 @Service
 public class EmailService {
 

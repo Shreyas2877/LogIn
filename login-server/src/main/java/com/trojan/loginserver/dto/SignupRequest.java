@@ -1,6 +1,10 @@
 // src/main/java/com/trojan/loginserver/dto/SignupRequest.java
 package com.trojan.loginserver.dto;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 public class SignupRequest {
     private String email;
     private String password;
