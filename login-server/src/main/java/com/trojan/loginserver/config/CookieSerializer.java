@@ -8,7 +8,7 @@ public class CookieSerializer {
     @Bean
     public DefaultCookieSerializer cookieSerializer() {
         DefaultCookieSerializer cookieSerializer = new DefaultCookieSerializer();
-        cookieSerializer.setSameSite("Strict");
+        cookieSerializer.setSameSite("Lax");
         return cookieSerializer;
     }
 }

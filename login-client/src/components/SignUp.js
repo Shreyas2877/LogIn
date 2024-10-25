@@ -1,4 +1,3 @@
-import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { signupController } from "../controllers/authController";
 import {
@@ -13,16 +12,10 @@ import {
 } from "@mui/material";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import Cookies from "js-cookie";
 import StyledHr from "./StyledHr";
 
 const Signup = () => {
   const navigate = useNavigate();
-
-  useEffect(() => {
-    // Clear JWT cookie
-    Cookies.remove("jwt");
-  }, []);
 
   const validationSchema = Yup.object({
     userName: Yup.string().required("Required"),

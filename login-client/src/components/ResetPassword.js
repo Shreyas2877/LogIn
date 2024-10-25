@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Container, TextField, Button, Typography, Box, Alert, Card } from "@mui/material";
 import { useNavigate, useLocation } from "react-router-dom";
-import { resetPasswordController } from "../controllers/authController";
+import { logoutController, resetPasswordController } from "../controllers/authController";
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState("");
@@ -55,6 +55,7 @@ const ResetPassword = () => {
       const result = await resetPasswordController(email, newPassword);
       if (result && result.success) {
         setSuccessMessage("Password reset successfully. Redirecting to login...");
+        await logoutController();
         setTimeout(() => navigate("/login"), 3000);
       } else {
         setError("Failed to reset password. Please try again.");

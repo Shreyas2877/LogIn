@@ -1,3 +1,4 @@
+// src/main/java/com/trojan/loginserver/service/CookieService.java
 package com.trojan.oauthserver.service;
 
 import jakarta.servlet.http.Cookie;
@@ -10,7 +11,8 @@ public class CookieService {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
         return cookie;
     }
 
@@ -18,7 +20,8 @@ public class CookieService {
         Cookie cookie = new Cookie(name, "");
         cookie.setPath("/");
         cookie.setMaxAge(0);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
         return cookie;
     }
 }

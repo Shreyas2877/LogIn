@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LoginContext } from "../context/LoginContext";
-import { validateOtp, sendEmailController } from "../controllers/authController"; // Make sure resendOtp is implemented in authController
+import { validateOtp, sendEmailController, fetchProfileController } from "../controllers/authController"; // Make sure resendOtp is implemented in authController
 import {
   Container,
   Box,
@@ -13,7 +13,6 @@ import {
   CardContent,
   Link,
 } from "@mui/material";
-import Cookies from "js-cookie";
 
 const OtpPage = () => {
   const [otp, setOtp] = useState("");
@@ -27,11 +26,20 @@ const OtpPage = () => {
   const email = location.state?.email;
 
   useEffect(() => {
-    const token = Cookies.get("jwt");
-    if (token) {
-      navigate("/profile");
-    }
+    const checkProfile = async () => {
+      try {
+        const result = await fetchProfileController();
+        if (result.success) {
+          navigate("/profile");
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      }
+    };
+
+    checkProfile();
   }, [navigate]);
+  
 
   useEffect(() => {
     if (!hasLoggedIn) {
