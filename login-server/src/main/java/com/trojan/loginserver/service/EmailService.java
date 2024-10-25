@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.mail.MessagingException;
@@ -19,6 +20,10 @@ import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Optional;
 import java.util.Random;
+
+/*
+ * @author: shreyas raviprakash
+ * */
 
 @Service
 public class EmailService {
@@ -39,6 +44,8 @@ public class EmailService {
 
     @Autowired
     private UserService userService;
+
+    private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public void sendOtp(String email) throws Exception {
         String otp = generateOtp();
@@ -271,5 +278,72 @@ public class EmailService {
         });
         sendDeregisteredEmail(email);
         logger.info("User deregistered successfully with email: {}", email);
+    }
+
+    public void sendForgotPasswordEmail(String email) {
+        try {
+            String token = Base64.getEncoder().encodeToString((email).getBytes());
+            String resetUrl = "http://localhost:3000/reset-password?token=" + token;
+
+            Optional<User> userOptional = userRepository.findByEmail(email);
+            if (userOptional.isPresent()) {
+                User user = userOptional.get();
+                userRepository.save(user);
+                sendPasswordResetEmail(email, resetUrl);
+            } else {
+                throw new ResourceNotFoundException("User not found");
+            }
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to send email", e);
+        }
+    }
+
+    private void sendPasswordResetEmail(String email, String resetUrl) throws MessagingException {
+        MimeMessage message = mailSender.createMimeMessage();
+        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+        helper.setFrom(fromEmail);
+        helper.setTo(email);
+        helper.setSubject("Password Reset for TrojApp");
+
+        String htmlContent = "<html><body style='font-family: Arial, sans-serif; color: #333;'>"
+                + "<div style='background-color: #f5f5f5; padding: 20px;'>"
+                + "<div style='max-width: 600px; margin: 0 auto; background-color: #fff; padding: 20px; border-radius: 10px;'>"
+                + "<div style='text-align: center;'>"
+                + "<h2 style='color: #4E65FF;'>Password Reset for TrojApp</h2>"
+                + "<p style='color: #888;'>Secure Authentication, Simplified</p>"
+                + "</div>"
+                + "<h3>Reset Your Password</h3>"
+                + "<p style='font-size: 16px;'>Hello,</p>"
+                + "<p style='font-size: 16px;'>Please click the link below to reset your password:</p>"
+                + "<div style='text-align: center; margin-top: 20px;'>"
+                + "<a href='" + resetUrl + "' style='background-color: #4E65FF; color: #fff; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Reset Password</a>"
+                + "</div>"
+                + "<p style='font-size: 16px; margin-top: 20px;'>This link will expire in <strong>5 minutes</strong>. If you didn’t request this, please ignore this email.</p>"
+                + "<div style='margin-top: 20px; padding: 15px; background-color: #eaf7ff; border-left: 5px solid #4E65FF;'>"
+                + "<p style='font-size: 14px; margin: 0;'>For your security, only click this link if you requested a password reset. TrojApp will never ask you for personal information via email.</p>"
+                + "</div>"
+                + "<div style='margin-top: 30px; text-align: center;'>"
+                + "<p style='font-size: 14px; color: #888;'>Need help? <a href='mailto:support@trojapp.com' style='color: #4E65FF;'>Contact our support team</a></p>"
+                + "<p style='font-size: 12px; color: #aaa;'>© 2024 TrojApp. All rights reserved.</p>"
+                + "</div>"
+                + "</div>"
+                + "</div>"
+                + "</body></html>";
+
+        helper.setText(htmlContent, true);
+
+        mailSender.send(message);
+    }
+
+    private String generateTemporaryPassword() {
+        int length = 6;
+        String characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        Random random = new Random();
+        StringBuilder password = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            password.append(characters.charAt(random.nextInt(characters.length())));
+        }
+        return password.toString();
     }
 }

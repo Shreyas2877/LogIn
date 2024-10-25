@@ -40,3 +40,11 @@ export const verifyEmailToken = (token) => {
 export const updateMfaStatus = (email, mfaStatus) => {
     return axiosInstance.post('/auth/updateMfa?email='+email+'&mfaEnabled='+mfaStatus);
 }
+
+export const sendPasswordRestEmail = (email) => {
+    return axiosInstance.post('/email/sendForgotPasswordEmail?email='+email);
+}
+
+export const resetPassword = (email, password) => {
+    return axiosInstance.post('/auth/updatePassword?email='+email+'&password='+password);
+}

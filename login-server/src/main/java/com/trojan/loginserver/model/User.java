@@ -3,6 +3,10 @@ package com.trojan.loginserver.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 @Entity
 @Table(name = "users")
 public class User {

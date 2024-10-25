@@ -4,6 +4,10 @@ package com.trojan.loginserver.service;
 import jakarta.servlet.http.Cookie;
 import org.springframework.stereotype.Service;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 @Service
 public class CookieService {
 
@@ -11,7 +15,8 @@ public class CookieService {
         Cookie cookie = new Cookie(name, value);
         cookie.setPath("/");
         cookie.setMaxAge(maxAge);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
         return cookie;
     }
 
@@ -19,7 +24,8 @@ public class CookieService {
         Cookie cookie = new Cookie(name, "");
         cookie.setPath("/");
         cookie.setMaxAge(0);
-        cookie.setSecure(false);
+        cookie.setSecure(true);
+        cookie.setHttpOnly(true);
         return cookie;
     }
 }

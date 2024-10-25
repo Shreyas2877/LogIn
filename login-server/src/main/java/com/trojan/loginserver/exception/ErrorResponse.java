@@ -1,5 +1,9 @@
 package com.trojan.loginserver.exception;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 public class ErrorResponse {
 
     private String message;

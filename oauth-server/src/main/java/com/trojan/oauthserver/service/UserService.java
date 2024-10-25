@@ -1,6 +1,10 @@
 // src/main/java/com/trojan/oauthserver/service/UserService.java
 package com.trojan.oauthserver.service;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;

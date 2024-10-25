@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router } from 'react-router-dom';
 import { ThemeProvider, CssBaseline, createTheme } from '@material-ui/core';
 import NavBar from './components/NavBar';
-import AppRoutes from './routes';
+import AppRoutes from './routes/index';
 import Background from './styles/Background'; // Import the Background component
 
 const darkTheme = createTheme({
@@ -10,6 +10,21 @@ const darkTheme = createTheme({
         mode: 'dark',
     },
 });
+
+const Footer = () => (
+    <div style={{
+        position: 'fixed',
+        bottom: 0,
+        left: 0,
+        padding: '8px 16px', // Adjust padding for a better fit
+        color: 'white',
+        zIndex: 2,
+        fontSize: '0.8rem', // Smaller font size
+        textAlign: 'center', // Center align the text
+    }}>
+        © 2023 Shreyas - Troj Auth
+    </div>
+);
 
 const App = () => {
     return (
@@ -41,6 +56,7 @@ const App = () => {
                         </div>
                     </Router>
                 </div>
+                <Footer /> {/* Add the Footer component */}
             </div>
         </ThemeProvider>
     );

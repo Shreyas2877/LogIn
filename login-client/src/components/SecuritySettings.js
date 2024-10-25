@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
-import { useNavigate } from 'react-router-dom';
 import {
   Box,
   Button,
@@ -12,9 +12,8 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import Alert from "@mui/lab/Alert";
 import StyledCard from "./StyledCard";
 import StyledHr from "./StyledHr";
-import { sendVerificationEmail, updateMfa, deleteUser } from "../controllers/authController";
+import { sendVerificationEmail, updateMfa, deleteUser, logoutController } from "../controllers/authController";
 import DeleteProfileCard from "./DeleteProfileCard";
-import Cookies from 'js-cookie';
 
 const useStyles = makeStyles((theme) => ({
   title: {
@@ -52,8 +51,8 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
-  const classes = useStyles();
   const navigate = useNavigate();
+  const classes = useStyles();
   const [isChanged, setIsChanged] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertSeverity, setAlertSeverity] = useState("success");
@@ -100,8 +99,15 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
     const result = await updateMfa(email, mfaStatus);
     if (result.success) {
       console.log('MFA status updated successfully');
+      setAlertMessage("Profile updated successfully.");
+      setAlertSeverity("success");
+      setTimeout(() => {
+        navigate("/profile"); // Navigate to the profile page
+      }, 2000); // Redirect after 2 seconds
     } else {
       console.error(`Error updating MFA status: ${result.message}`);
+      setAlertMessage("Failed to update profile. Please try again.");
+      setAlertSeverity("error");
     }
   };
 
@@ -110,11 +116,10 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
     handleInteraction();
   };
 
-  const handleDeleteProfile = () => {
+  const handleDeleteProfile = async () => {
     deleteUser(email);
     console.log('Delete profile clicked');
-    Cookies.remove('jwt');
-    navigate('/login');
+    await logoutController();
   };
 
   return (

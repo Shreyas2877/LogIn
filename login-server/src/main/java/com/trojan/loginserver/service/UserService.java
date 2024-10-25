@@ -18,6 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 @Service
 public class UserService {
 
@@ -54,12 +58,15 @@ public class UserService {
         return exists;
     }
 
-    public Optional<User> loginUser(String email, String password) {
+    public UserProfile loginUser(String email, String password, HttpServletResponse response) {
         logger.debug("Attempting login for user with email: {}", email);
         Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent() && passwordEncoder.matches(password, user.get().getPassword())) {
             logger.info("Login successful for user with email: {}", email);
-            return user;
+            if(!user.get().getMfaEnabled().equals(MfaStatus.TRUE)){
+                setJwt(response, user);
+            }
+            return user.get().getUserProfile();
         }
         logger.warn("Login failed for user with email: {}", email);
         throw new ResourceNotFoundException("User not found");
@@ -98,7 +105,7 @@ public class UserService {
         User loggedInUser = existingUser.get();
         String token = jwtService.generateToken(loggedInUser.getEmail(), loggedInUser.getId());
 
-        Cookie cookie = cookieService.createCookie("jwt", token, 86400); // 1 day in seconds
+        Cookie cookie = cookieService.createCookie("jwt_access", token, 86400); // 1 day in seconds
         response.addCookie(cookie);
     }
 
@@ -122,6 +129,19 @@ public class UserService {
             logger.info("MFA status updated successfully for user with email: {}", email);
         }, () -> {
             logger.warn("User not found for updating MFA status with email: {}", email);
+            throw new ResourceNotFoundException("User Not Found");
+        });
+    }
+
+    public void updatePassword(String email, String password) {
+        logger.debug("Updating password for user with email: {}", email);
+        Optional<User> user = userRepository.findByEmail(email);
+        user.ifPresentOrElse(u -> {
+            u.setPassword(passwordEncoder.encode(password));
+            userRepository.save(u);
+            logger.info("Password updated successfully for user with email: {}", email);
+        }, () -> {
+            logger.warn("User not found for updating password with email: {}", email);
             throw new ResourceNotFoundException("User Not Found");
         });
     }

@@ -6,7 +6,6 @@ import com.trojan.loginserver.dto.SignupRequest;
 import com.trojan.loginserver.dto.LoginRequest;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
 import com.trojan.loginserver.model.MfaStatus;
-import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.model.UserProfile;
 import com.trojan.loginserver.service.CookieService;
 import com.trojan.loginserver.service.EmailService;
@@ -23,7 +22,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Optional;
+/*
+* @author: shreyas raviprakash
+* */
 
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
 @RestController
@@ -57,21 +58,11 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
+    public ResponseEntity<UserProfile> login(@RequestBody LoginRequest loginRequest, HttpServletResponse response) {
         logger.debug("Login request received for email: {}", loginRequest.getEmail());
-        Optional<User> existingUser = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword());
-        if (existingUser.isPresent()) {
-            //set this if enable MFA is present in properties
-            User currentUser = existingUser.get();
-            if(!currentUser.getMfaEnabled().equals(MfaStatus.TRUE)){
-                userService.setJwt(response, existingUser);
-            }
-
-            logger.info("Login successful for email: {}", loginRequest.getEmail());
-            return ResponseEntity.ok("Login successful");
-        }
-        logger.warn("Invalid login attempt for email: {}", loginRequest.getEmail());
-        return ResponseEntity.status(401).body("Invalid email or password");
+        UserProfile userProfile = userService.loginUser(loginRequest.getEmail(), loginRequest.getPassword(), response);
+        logger.info("Login successful for email: {}", loginRequest.getEmail());
+        return ResponseEntity.ok(userProfile);
     }
 
     @GetMapping("/profile")
@@ -102,13 +93,13 @@ public class AuthController {
             return ResponseEntity.ok(userProfile);
         } catch (Exception e) {
             logger.error("Invalid token", e);
-            return ResponseEntity.status(401).body("Invalid token");
+            return ResponseEntity.status(401).body("Unauthorized");
         }
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletResponse response) {
-        Cookie cookie = cookieService.deleteCookie("jwt");
+        Cookie cookie = cookieService.deleteCookie("jwt_access");
         response.addCookie(cookie);
         logger.info("Logout successful");
         return ResponseEntity.ok("Logout successful");
@@ -118,7 +109,7 @@ public class AuthController {
     public ResponseEntity<?> deregister(@RequestParam String email, HttpServletResponse response) throws MessagingException {
         logger.debug("Deregister request received for email: {}", email);
         emailService.deregisterUser(email);
-        Cookie cookie = cookieService.deleteCookie("jwt");
+        Cookie cookie = cookieService.deleteCookie("jwt_access");
         response.addCookie(cookie);
         logger.info("User deregistered successfully: {}", email);
         return ResponseEntity.ok("User deregistered successfully");
@@ -133,5 +124,11 @@ public class AuthController {
     public ResponseEntity<?> updateMfa(@RequestParam String email, @RequestParam MfaStatus mfaEnabled) {
         userService.updateMfa(email, mfaEnabled);
         return ResponseEntity.ok("MFA updated successfully");
+    }
+
+    @PostMapping("/updatePassword")
+    public ResponseEntity<?> updatePassword(@RequestParam String email, @RequestParam String password) {
+        userService.updatePassword(email, password);
+        return ResponseEntity.ok("Password updated successfully");
     }
 }

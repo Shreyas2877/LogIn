@@ -18,6 +18,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Map;
 
+/*
+ * @author: shreyas raviprakash
+ * */
+
 @RestController
 public class JwtController {
 
@@ -49,7 +53,7 @@ public class JwtController {
 
         // Generate the JWT
         String token = jwtService.generateToken(email, id);
-        Cookie jwtCookie = cookieService.createCookie("jwt", token, 86400); // 1 day in seconds
+        Cookie jwtCookie = cookieService.createCookie("jwt_access", token, 86400); // 1 day in seconds
 
         response.addCookie(jwtCookie);
         logger.info("JWT generated and added to cookie for user: {}", userName);
