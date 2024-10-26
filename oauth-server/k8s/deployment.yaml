@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: oauth-server
+  labels:
+    app: oauth-server
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: oauth-server
+  template:
+    metadata:
+      labels:
+        app: oauth-server
+    spec:
+      containers:
+        - name: oauth-server
+          image: trojan2877/oauth-server
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8081
+          env:
+            - name: SPRING_PROFILES_ACTIVE
+              value: "k8s"
