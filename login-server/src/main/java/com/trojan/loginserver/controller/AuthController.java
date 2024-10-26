@@ -71,7 +71,7 @@ public class AuthController {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("jwt".equals(cookie.getName())) {
+                if ("jwt_access".equals(cookie.getName())) {
                     token = cookie.getValue();
                     break;
                 }
