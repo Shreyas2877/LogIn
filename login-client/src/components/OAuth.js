@@ -1,6 +1,6 @@
 // src/components/OAuth.js
 import React from 'react';
-import { Button, Divider, Box } from '@mui/material';
+import { Button, Box } from '@mui/material';
 import GitHubIcon from '@mui/icons-material/GitHub';
 import GoogleIcon from '@mui/icons-material/Google';
 
@@ -15,7 +15,6 @@ const OAuth = () => {
 
     return (
         <Box mt={3}>
-            <Divider>or</Divider>
             <Box mt={2}>
                 <Button
                     variant="contained"

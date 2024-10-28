@@ -7,6 +7,7 @@ import com.trojan.loginserver.model.MfaStatus;
 import com.trojan.loginserver.model.User;
 import com.trojan.loginserver.model.UserProfile;
 import com.trojan.loginserver.repository.UserRepository;
+import com.trojan.loginserver.util.EncryptionUtil;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 /*
@@ -35,6 +37,12 @@ public class UserService {
 
     @Autowired
     private CookieService cookieService;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private EncryptionUtil encryptionUtil = new EncryptionUtil();
 
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
@@ -109,15 +117,20 @@ public class UserService {
         response.addCookie(cookie);
     }
 
-    public Optional<User> getUserWithEmail(String email){
-        logger.debug("Fetching user with email: {}", email);
-        Optional<User> user = userRepository.findByEmail(email);
-        if(user.isPresent()){
-            logger.info("User fetched successfully with email: {}", email);
-            return user;
+    public boolean validateOtp(String email, String otp, HttpServletResponse response) throws Exception {
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            String decryptedOtp = encryptionUtil.decrypt(user.getEmailOtp());
+            if(decryptedOtp.equals(otp) && user.getOtpExpiration().isAfter(LocalDateTime.now())) {
+                User loggedInUser = userOptional.get();
+                String token = jwtService.generateToken(loggedInUser.getEmail(), loggedInUser.getId());
+                Cookie cookie = cookieService.createCookie("jwt_access", token, 86400); // 1 day in seconds
+                response.addCookie(cookie);
+                return true;
+            }
         }
-        logger.warn("User not found with email: {}", email);
-        throw new ResourceNotFoundException("User Not Found");
+        return false;
     }
 
     public void updateMfa(String email, MfaStatus mfaEnabled) {
@@ -139,6 +152,11 @@ public class UserService {
         user.ifPresentOrElse(u -> {
             u.setPassword(passwordEncoder.encode(password));
             userRepository.save(u);
+            try {
+                emailService.sendPasswordResetConfirmationEmail(email);
+            } catch (MessagingException e) {
+                throw new ResourceNotFoundException("Error sending email");
+            }
             logger.info("Password updated successfully for user with email: {}", email);
         }, () -> {
             logger.warn("User not found for updating password with email: {}", email);
