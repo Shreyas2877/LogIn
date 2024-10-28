@@ -70,35 +70,41 @@ const Profile = () => {
             Login successful.
           </AnimatedAlert>
         </Box>
-        {error ? (
-          <AnimatedAlert severity="error" show={true}>
-            {error}
-          </AnimatedAlert>
-        ) : profile ? (
-          <>
-            <WelcomeText variant="h6">Welcome, {profile.user}</WelcomeText>
-            <StyledCard>
-              <CardContent>
-                <Box display="flex" alignItems="center" mb={2}>
-                  <Avatar sx={{ bgcolor: "primary.main", mr: 2 }}>
-                    {profile.user.charAt(0).toUpperCase()}
-                  </Avatar>
-                  <Typography variant="h5" component="div">
-                    {profile.user}
-                  </Typography>
-                </Box>
-                <Typography variant="body2">Email: {profile.email}</Typography>
-              </CardContent>
-            </StyledCard>
-            <AnimatedSecuritySettings 
-              emailVerified={profile.emailVerified} 
-              mfaEnabled={profile.mfaEnabled} 
-              email={profile.email}
-            /> 
-          </>
-        ) : (
-          <WelcomeText variant="h6">Loading...</WelcomeText>
-        )}
+        {(() => {
+          if (error) {
+            return (
+              <AnimatedAlert severity="error" show={true}>
+                {error}
+              </AnimatedAlert>
+            );
+          } else if (profile) {
+            return (
+              <>
+                <WelcomeText variant="h6">Welcome, {profile.user}</WelcomeText>
+                <StyledCard>
+                  <CardContent>
+                    <Box display="flex" alignItems="center" mb={2}>
+                      <Avatar sx={{ bgcolor: "primary.main", mr: 2 }}>
+                        {profile.user.charAt(0).toUpperCase()}
+                      </Avatar>
+                      <Typography variant="h5" component="div">
+                        {profile.user}
+                      </Typography>
+                    </Box>
+                    <Typography variant="body2">Email: {profile.email}</Typography>
+                  </CardContent>
+                </StyledCard>
+                <AnimatedSecuritySettings 
+                  emailVerified={profile.emailVerified} 
+                  mfaEnabled={profile.mfaEnabled} 
+                  email={profile.email}
+                /> 
+              </>
+            );
+          } else {
+            return <WelcomeText variant="h6">Loading...</WelcomeText>;
+          }
+        })()}
       </Box>
     </Container>
   );
