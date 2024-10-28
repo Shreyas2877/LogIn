@@ -53,12 +53,12 @@ const ResetPassword = () => {
       }
 
       const result = await resetPasswordController(email, newPassword);
-      if (result && result.success) {
+      if (result?.success) {
         setSuccessMessage("Password reset successfully. Redirecting to login...");
         await logoutController();
         setTimeout(() => navigate("/login"), 3000);
       } else {
-        setError("Failed to reset password. Please try again.");
+        setError(result.message);
       }
     } catch (error) {
       console.error("Error resetting password:", error);

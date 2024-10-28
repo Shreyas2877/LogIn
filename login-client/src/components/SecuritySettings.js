@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import Card from '@mui/material/Card';
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -126,9 +127,9 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
     <>
     <StyledCard>
       <CardContent>
-        <Box mb={3}>
+        <Box mb={2}>
           <Typography variant="h6" className={classes.title}>
-            Security Settings
+            Account Settings
           </Typography>
         </Box>
         {alertMessage && (
@@ -207,19 +208,19 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
         </Box>
       </CardContent>
     </StyledCard>
-    <StyledCard>
+    <Card sx={{ backgroundColor: '#333' , borderRadius: 2}}>
         <CardContent>
           <Box>
-          <DeleteProfileCard
-            classes={classes}
-            enteredEmail={enteredEmail}
-            email={email}
-            handleEmailChange={handleEmailChange}
-            handleDeleteProfile={handleDeleteProfile}
-          />
+            <DeleteProfileCard
+              classes={classes}
+              enteredEmail={enteredEmail}
+              email={email}
+              handleEmailChange={handleEmailChange}
+              handleDeleteProfile={handleDeleteProfile}
+            />
           </Box>
         </CardContent>
-      </StyledCard>
+      </Card>
       </>
   );
 };

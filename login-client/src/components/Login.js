@@ -14,6 +14,7 @@ import {
   Alert,
   Link,
   Card,
+  Divider,
 } from "@mui/material";
 import { LoginContext } from "../context/LoginContext";
 import OAuth from "./OAuth";
@@ -49,7 +50,7 @@ const Login = () => {
   }, [successMessage]);
 
   useEffect(() => {
-    if (location.state && location.state.message) {
+    if (location.state?.message) {
       setSuccessMessage(location.state.message);
     }
   }, [location.state]);
@@ -188,6 +189,13 @@ const Login = () => {
               New user? <Link href="/signup" color="#3f51b5">Sign up here</Link>
             </Typography>
           </Box>
+          <Box display="flex" alignItems="center" my={2}>
+              <Divider sx={{ flexGrow: 1 }} />
+              <Typography variant="body2" color="textSecondary" sx={{ mx: 2 }}>
+                or
+              </Typography>
+              <Divider sx={{ flexGrow: 1 }} />
+            </Box>
           <OAuth />
         </Card>
       </Box>

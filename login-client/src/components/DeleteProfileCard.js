@@ -24,14 +24,14 @@ const DeleteProfileCard = ({ classes, enteredEmail, email, handleEmailChange, ha
   };
 
   return (
-    <Box mt={4} mb={4}>
-      <Typography variant="h6" className={classes.subtitle}>
+    <Box mt={2} mb={2}>
+      <Typography variant="h6" className={classes.subtitle} sx={{ color: '#fff' }}>
         Delete Profile
       </Typography>
-      <Typography variant="body2" className={classes.body}>
+      <Typography variant="body2" className={classes.body} sx={{ color: '#ccc' }}>
         Deleting your profile will delete all the data relating to this account with us. To proceed with the deletion, please enter your email address to confirm.
       </Typography>
-      <Box mt={4} mb={4}>
+      <Box mt={2} mb={2}>
         <TextField
           placeholder={email}
           variant="outlined"
@@ -39,7 +39,7 @@ const DeleteProfileCard = ({ classes, enteredEmail, email, handleEmailChange, ha
           value={enteredEmail}
           onChange={handleEmailChange}
           InputProps={{
-            style: { height: '50px' }
+            style: { height: '50px', backgroundColor: '#555', color: '#fff' }
           }}
           InputLabelProps={{
             shrink: false
@@ -48,7 +48,7 @@ const DeleteProfileCard = ({ classes, enteredEmail, email, handleEmailChange, ha
       </Box>
       {error && <Alert severity="error">{error}</Alert>}
       {successMessage && <Alert severity="success">{successMessage}</Alert>}
-      <Box mt={4} mb={4}>
+      <Box mt={2} mb={2}>
         <Button
           variant="contained"
           color="default"
