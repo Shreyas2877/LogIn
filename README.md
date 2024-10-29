@@ -1,6 +1,6 @@
 # Login Application
 
-<img src="path/to/your/image.png" alt="Login Application" style="width:100%; max-width:600px; display:block; margin:auto;"/>
+<img src="./System Design Diagrams/Troj-App System Diagram Build 1.0.png" alt="Login Application" style="width:100%; max-width:600px; display:block; margin:auto;"/>
 
 A secure, modern login application built with **React** on the frontend and **Spring Boot** on the backend, utilizing **JWT-based authentication** and **OAuth 2.0** (Google & GitHub) for account synchronization across multiple login options. It includes **multi-factor authentication (MFA)** with both email OTP and TOTP support (via Microsoft and Google Authenticators).
 
@@ -62,10 +62,12 @@ Ensure you have the following installed:
   ```bash
    git clone https://github.com/Shreyas2877/LogIn.git
    cd login-application
+   ```
   
 2. **Run the application with Skaffold:**
   ```bash
   skaffold dev
+  ```
 This will deploy the entire stack on your local Kubernetes cluster.
 
 Usage
@@ -78,3 +80,4 @@ Start the development environment:
 
 ```bash
   skaffold dev
+```
