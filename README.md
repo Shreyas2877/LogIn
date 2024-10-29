@@ -1,6 +1,6 @@
 # Login Application
 
-![Placeholder for image]
+<img src="path/to/your/image.png" alt="Login Application" style="width:100%; max-width:600px; display:block; margin:auto;"/>
 
 A secure, modern login application built with **React** on the frontend and **Spring Boot** on the backend, utilizing **JWT-based authentication** and **OAuth 2.0** (Google & GitHub) for account synchronization across multiple login options. It includes **multi-factor authentication (MFA)** with both email OTP and TOTP support (via Microsoft and Google Authenticators).
 
@@ -16,47 +16,65 @@ A secure, modern login application built with **React** on the frontend and **Sp
 - [License](#license)
 
 ## Features
-- **JWT Authentication** with cookies
-- **OAuth 2.0 Login** via Google and GitHub with seamless account synchronization
-- **Multi-Factor Authentication (MFA)**:
-  - Email OTP
-  - TOTP via Microsoft and Google Authenticators
-- **Dockerized Environment** for easy setup and deployment
-- **Kubernetes** integration with Skaffold for simplified local development and testing
+<ul style="list-style-type: none;">
+  <li>✅ <strong>JWT Authentication</strong> with cookies</li>
+  <li>✅ <strong>OAuth 2.0 Login</strong> via Google and GitHub with seamless account synchronization</li>
+  <li>✅ <strong>Multi-Factor Authentication (MFA)</strong>:
+    <ul>
+      <li>📧 Email OTP</li>
+      <li>🔢 TOTP via Microsoft and Google Authenticators</li>
+    </ul>
+  </li>
+  <li>✅ <strong>Dockerized Environment</strong> for easy setup and deployment</li>
+  <li>✅ <strong>Kubernetes</strong> integration with Skaffold for simplified local development and testing</li>
+</ul>
 
 ## Architecture
 The application comprises three backend services and one frontend service:
-- **login-server**: Manages user authentication and JWT-based authorization.
-- **oauth-server**: Handles OAuth 2.0 login via Google and GitHub.
-- **totp-server**: Manages TOTP-based MFA.
-- **login-client**: React-based frontend for user interaction.
+<ul style="list-style-type: none;">
+  <li>🔒 <strong>login-server</strong>: Manages user authentication and JWT-based authorization.</li>
+  <li>🔑 <strong>oauth-server</strong>: Handles OAuth 2.0 login via Google and GitHub.</li>
+  <li>🔢 <strong>totp-server</strong>: Manages TOTP-based MFA.</li>
+  <li>💻 <strong>login-client</strong>: React-based frontend for user interaction.</li>
+</ul>
+
+<img src="path/to/architecture-diagram.png" alt="Architecture Diagram" style="width:100%; max-width:600px; display:block; margin:auto;"/>
 
 ## Tech Stack
-- **Frontend**: React, JavaScript
-- **Backend**: Spring Boot, Java
-- **Database**: MySQL
-- **Authentication**: JWT, OAuth 2.0, MFA (OTP & TOTP)
-- **Deployment**: Docker, Kubernetes, Skaffold
+<ul style="list-style-type: none;">
+  <li>🖥️ <strong>Frontend</strong>: React, JavaScript</li>
+  <li>🛠️ <strong>Backend</strong>: Spring Boot, Java</li>
+  <li>💾 <strong>Database</strong>: MySQL</li>
+  <li>🔐 <strong>Authentication</strong>: JWT, OAuth 2.0, MFA (OTP & TOTP)</li>
+  <li>🚀 <strong>Deployment</strong>: Docker, Kubernetes, Skaffold</li>
+</ul>
 
 ## Prerequisites
 Ensure you have the following installed:
-- **Docker**
-- **Kubernetes** (Minikube or a similar local cluster)
-- **Skaffold**
+<ul style="list-style-type: none;">
+  <li>🐳 <strong>Docker</strong></li>
+  <li>☸️ <strong>Kubernetes</strong> (Minikube or a similar local cluster)</li>
+  <li>🚀 <strong>Skaffold</strong></li>
+</ul>
 
 ## Installation
 1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/your-username/login-application.git
+  ```bash
+   git clone https://github.com/Shreyas2877/LogIn.git
    cd login-application
-
-Run the application with Skaffold: In the Login folder, execute:
-
-skaffold dev
-
+  
+2. **Run the application with Skaffold:**
+  ```bash
+  skaffold dev
 This will deploy the entire stack on your local Kubernetes cluster.
 
 Usage
 Visit https://login.dev to access the login application.
 
-be sure to add the entry in hosts file
+Note: Be sure to add the entry in your hosts file.
+
+Development Workflow
+Start the development environment:
+
+```bash
+  skaffold dev
