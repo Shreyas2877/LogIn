@@ -49,3 +49,14 @@ Ensure you have the following installed:
    ```bash
    git clone https://github.com/your-username/login-application.git
    cd login-application
+
+Run the application with Skaffold: In the Login folder, execute:
+
+skaffold dev
+
+This will deploy the entire stack on your local Kubernetes cluster.
+
+Usage
+Visit https://login.dev to access the login application.
+
+be sure to add the entry in hosts file
