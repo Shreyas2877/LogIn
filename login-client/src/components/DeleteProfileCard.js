@@ -3,23 +3,59 @@ import { Box, Typography, TextField, Button } from '@material-ui/core';
 import { Alert } from '@mui/material';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { useNavigate } from 'react-router-dom';
+import { makeStyles } from '@material-ui/core/styles';
+import { deleteUser, logoutController } from '../controllers/authController';
 
-const DeleteProfileCard = ({ classes, enteredEmail, email, handleEmailChange, handleDeleteProfile }) => {
-  const [successMessage, setSuccessMessage] = useState("");
-  const [error, setError] = useState("");
+const useStyles = makeStyles((theme) => ({
+  subtitle: {
+    color: theme.palette.secondary.main,
+  },
+  body: {
+    color: '#696969',
+  },
+  button: {
+    marginTop: '10px',
+  },
+  deleteButton: {
+    backgroundColor: theme.palette.error.main,
+    color: theme.palette.common.white,
+    '&:hover': {
+      backgroundColor: theme.palette.error.dark,
+    },
+  },
+}));
+
+const DeleteProfileCard = ({ email }) => {
+  const classes = useStyles();
+  const [enteredEmail, setEnteredEmail] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  const handleEmailChange = (event) => {
+    setEnteredEmail(event.target.value);
+  };
+
+  const handleDeleteProfile = async () => {
+    try {
+      await deleteUser(email);
+      await logoutController();
+    } catch (error) {
+      throw new Error('Failed to delete account');
+    }
+  };
+
   const handleDelete = async () => {
-    setError("");
-    setSuccessMessage("");
+    setError('');
+    setSuccessMessage('');
 
     try {
-      await handleDeleteProfile(); // Call the function to delete the profile
-      setSuccessMessage("Account deleted successfully. Redirecting to login...");
-      setTimeout(() => navigate("/login"), 3000); // Redirect to login after 3 seconds
+      await handleDeleteProfile();
+      setSuccessMessage('Account deleted successfully. Redirecting to login...');
+      setTimeout(() => navigate('/login'), 3000);
     } catch (err) {
-      console.error("Failed to delete account:", err);
-      setError("Failed to delete account. Please try again.");
+      console.error('Failed to delete account:', err);
+      setError('Failed to delete account. Please try again.');
     }
   };
 
@@ -39,10 +75,10 @@ const DeleteProfileCard = ({ classes, enteredEmail, email, handleEmailChange, ha
           value={enteredEmail}
           onChange={handleEmailChange}
           InputProps={{
-            style: { height: '50px', backgroundColor: '#555', color: '#fff' }
+            style: { height: '50px', backgroundColor: '#555', color: '#fff' },
           }}
           InputLabelProps={{
-            shrink: false
+            shrink: false,
           }}
         />
       </Box>

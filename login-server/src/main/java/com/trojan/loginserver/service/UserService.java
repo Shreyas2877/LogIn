@@ -48,12 +48,13 @@ public class UserService {
     private final BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     public void registerUser(String email, String password, String userName) {
-        String Provider = "local";
+        String provider = "local";
         logger.debug("Registering user with email: {}", email);
         String encodedPassword = passwordEncoder.encode(password);
         try {
-            userRepository.save(new User(email, encodedPassword, userName, Provider, false, MfaStatus.FALSE, false));
+            userRepository.save(new User(email, encodedPassword, userName, provider, false, MfaStatus.FALSE, false));
             logger.info("User registered successfully with email: {}", email);
+            emailService.sendWelcomeEmail(email);
         } catch (Exception e) {
             logger.error("Error saving user to database for email: {}", email, e);
             throw new DatabaseException("Error saving user to database");

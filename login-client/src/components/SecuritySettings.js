@@ -16,8 +16,6 @@ import StyledHr from "./StyledHr";
 import {
   sendVerificationEmail,
   updateMfa,
-  deleteUser,
-  logoutController,
   generateTotpQrCode,
 } from "../controllers/authController";
 import DeleteProfileCard from "./DeleteProfileCard";
@@ -44,29 +42,36 @@ const useStyles = makeStyles((theme) => ({
   icon: {
     marginLeft: "5px",
   },
-  deleteButton: {
-    backgroundColor: theme.palette.error.main,
-    color: theme.palette.common.white,
-    "&:hover": {
-      backgroundColor: theme.palette.error.dark,
-    },
-  },
   centerBox: {
     display: "flex",
     justifyContent: "center",
   },
-  qrCode: {
-    marginTop: "10px",
+  qrCodeOverlay: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    width: "100vw",
+    height: "100vh",
+    backgroundColor: "rgba(0, 0, 0, 0.8)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1000,
+  },
+  qrCodeContainer: {
+    backgroundColor: "#fff",
+    padding: theme.spacing(3),
+    borderRadius: theme.shape.borderRadius,
+    boxShadow: theme.shadows[5],
     textAlign: "center",
+  },
+  qrCodeImage: {
+    width: "200px",
+    height: "200px",
   },
 }));
 
-const SecuritySettings = ({
-  emailVerified,
-  mfaEnabled,
-  email,
-  qrCodeEnabled,
-}) => {
+const SecuritySettings = ({ emailVerified, mfaEnabled, email, qrCodeEnabled }) => {
   const navigate = useNavigate();
   const classes = useStyles();
   const [isChanged, setIsChanged] = useState(false);
@@ -74,9 +79,9 @@ const SecuritySettings = ({
   const [alertSeverity, setAlertSeverity] = useState("success");
   const [isVerifyEmailDisabled, setIsVerifyEmailDisabled] = useState(false);
   const [isMfaEnabled, setIsMfaEnabled] = useState(mfaEnabled === "TRUE");
-  const [initialMfaEnabled] = useState(mfaEnabled === "TRUE"); // Track the initial state of MFA
-  const [enteredEmail, setEnteredEmail] = useState("");
+  const [initialMfaEnabled] = useState(mfaEnabled === "TRUE");
   const [qrCodeUrl, setQrCodeUrl] = useState("");
+  const [showQrCode, setShowQrCode] = useState(false);
 
   useEffect(() => {
     // Check if there's a change in the MFA status compared to the initial value
@@ -86,14 +91,6 @@ const SecuritySettings = ({
       setIsChanged(false);
     }
   }, [isMfaEnabled, initialMfaEnabled]);
-
-  const handleInteraction = () => {
-    setIsChanged(true);
-  };
-
-  const handleEmailChange = (event) => {
-    setEnteredEmail(event.target.value);
-  };
 
   const handleVerifyEmail = async () => {
     setIsVerifyEmailDisabled(true);
@@ -110,42 +107,36 @@ const SecuritySettings = ({
     }, 10000); // Re-enable the button after 10 seconds
   };
 
-  const handleUpdateProfile = async () => {
-    const mfaStatus = isMfaEnabled ? "TRUE" : "FALSE";
-    const result = await updateMfa(email, mfaStatus);
-    if (result.success) {
-      console.log("MFA status updated successfully");
-      setAlertMessage("Profile updated successfully.");
-      setAlertSeverity("success");
-      setTimeout(() => {
-        navigate("/profile"); // Navigate to the profile page
-      }, 2000); // Redirect after 2 seconds
-    } else {
-      console.error(`Error updating MFA status: ${result.message}`);
-      setAlertMessage("Failed to update profile. Please try again.");
-      setAlertSeverity("error");
-    }
-  };
-
   const handleMfaChange = (event) => {
     setIsMfaEnabled(event.target.checked);
-    handleInteraction();
-  };
-
-  const handleDeleteProfile = async () => {
-    deleteUser(email);
-    console.log("Delete profile clicked");
-    await logoutController();
+    setIsChanged(true);
   };
 
   const handleGenerateQrCode = async () => {
     try {
       const response = await generateTotpQrCode(email);
-      console.log("Response as string: ", JSON.stringify(response));
       setQrCodeUrl(`data:image/png;base64,${response.data}`);
+      setShowQrCode(true);
     } catch (error) {
       console.error("Error generating QR code:", error);
       setAlertMessage("Failed to generate QR code. Please try again.");
+      setAlertSeverity("error");
+    }
+  };
+
+  const handleCloseQrCode = () => setShowQrCode(false);
+
+  const handleUpdateProfile = async () => {
+    const mfaStatus = isMfaEnabled ? "TRUE" : "FALSE";
+    const result = await updateMfa(email, mfaStatus);
+    if (result.success) {
+      setAlertMessage("Profile updated successfully.");
+      setAlertSeverity("success");
+      setTimeout(() => {
+        navigate("/profile");
+      }, 2000);
+    } else {
+      setAlertMessage("Failed to update profile. Please try again.");
       setAlertSeverity("error");
     }
   };
@@ -217,7 +208,7 @@ const SecuritySettings = ({
                 {isMfaEnabled && emailVerified && (
                   <>
                     <Typography className={classes.verifiedText}>
-                      Enabled<CheckCircleIcon className={classes.icon} />
+                      Enabled <CheckCircleIcon className={classes.icon} />
                     </Typography>
                     <Button
                       variant="contained"
@@ -234,14 +225,9 @@ const SecuritySettings = ({
                         className={classes.disabledText}
                         style={{ marginTop: "10px" }}
                       >
-                        The TOTP QR code has already been set-up for this account. If you need
-                        to request a new QR code, please contact us.
+                        The TOTP QR code has already been set up for this account. To request a
+                        new QR code, please contact support.
                       </Typography>
-                    )}
-                    {qrCodeUrl && (
-                      <Box className={classes.qrCode}>
-                        <img src={qrCodeUrl} alt="TOTP QR Code" />
-                      </Box>
                     )}
                   </>
                 )}
@@ -261,16 +247,23 @@ const SecuritySettings = ({
           </Box>
         </CardContent>
       </StyledCard>
+
+      {/* QR Code Overlay */}
+      {showQrCode && (
+        <div className={classes.qrCodeOverlay} onClick={handleCloseQrCode}>
+          <div className={classes.qrCodeContainer} onClick={(e) => e.stopPropagation()}>
+            <img src={qrCodeUrl} alt="TOTP QR Code" className={classes.qrCodeImage} />
+            <Typography variant="body2" style={{ marginTop: '10px' }}>
+              Scan this QR code with your authenticator app
+            </Typography>
+          </div>
+        </div>
+      )}
+
       <Card sx={{ backgroundColor: "#333", borderRadius: 2 }}>
         <CardContent>
           <Box>
-            <DeleteProfileCard
-              classes={classes}
-              enteredEmail={enteredEmail}
-              email={email}
-              handleEmailChange={handleEmailChange}
-              handleDeleteProfile={handleDeleteProfile}
-            />
+            <DeleteProfileCard email={email} />
           </Box>
         </CardContent>
       </Card>

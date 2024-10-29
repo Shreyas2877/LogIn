@@ -101,7 +101,7 @@ const Login = () => {
           color="#3f51b5"
           fontWeight="bold"
         >
-          Welcome Back to TrojApp!
+          Welcome to TrojApp
         </Typography>
         <Typography
           variant="subtitle1"

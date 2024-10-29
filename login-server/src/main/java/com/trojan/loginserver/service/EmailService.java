@@ -146,6 +146,12 @@ public class EmailService {
         sendEmail(email, subject, htmlContent);
     }
 
+    public void sendWelcomeEmail(String email) throws MessagingException {
+        String subject = "Welcome to TrojApp!";
+        String htmlContent = buildWelcomeEmailContent();
+        sendEmail(email, subject, htmlContent);
+    }
+
     private String buildEmailTemplate(String title, String subtitle, String bodyContent) {
         return "<html><body style='font-family: Arial, sans-serif; color: #333;'>"
                 + "<div style='background-color: #f5f5f5; padding: 20px;'>"
@@ -224,6 +230,17 @@ public class EmailService {
                 + "<p style='font-size: 14px; margin: 0;'>For your security, only click this link if you requested a password reset. TrojApp will never ask you for personal information via email.</p>"
                 + "</div>";
         return buildEmailTemplate("Password Reset for TrojApp", "Secure Authentication, Simplified", bodyContent);
+    }
+
+    private String buildWelcomeEmailContent() {
+        String bodyContent = "<h3>Welcome to TrojApp!</h3>"
+                + "<p style='font-size: 16px;'>Hello,</p>"
+                + "<p style='font-size: 16px;'>Thank you for signing up for TrojApp. We are excited to have you on board.</p>"
+                + "<p style='font-size: 16px;'>If you have any questions or need assistance, feel free to reach out to our support team.</p>"
+                + "<div style='margin-top: 20px; padding: 15px; background-color: #eaf7ff; border-left: 5px solid #4E65FF;'>"
+                + "<p style='font-size: 14px; margin: 0;'>For your security, never share your account details with anyone. TrojApp will never ask for your password via email, phone, or any other channel.</p>"
+                + "</div>";
+        return buildEmailTemplate("Welcome to TrojApp", "Your journey starts here", bodyContent);
     }
 
     private String generateOtp() {
