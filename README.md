@@ -1,5 +1,3 @@
-# Login Application
-
 <!-- <img src="" alt="Login Application" style="width:100%; max-width:600px; display:block; margin:auto;"/> -->
 
 A secure, modern login application built with **React** on the frontend and **Spring Boot** on the backend, utilizing **JWT-based authentication** and **OAuth 2.0** (Google & GitHub) for account synchronization across multiple login options. It includes **multi-factor authentication (MFA)** with both email OTP and TOTP support (via Microsoft and Google Authenticators).
@@ -12,6 +10,7 @@ A secure, modern login application built with **React** on the frontend and **Sp
 - [Installation](#installation)
 - [Usage](#usage)
 - [Development Workflow](#development-workflow)
+- [TODOs](#todos)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -70,14 +69,28 @@ Ensure you have the following installed:
   ```
 This will deploy the entire stack on your local Kubernetes cluster.
 
-Usage
-Visit https://login.dev to access the login application.
+## Usage
 
-Note: Be sure to add the entry in your hosts file.
+Visit [https://login.dev](https://login.dev) to access the login application.
 
-Development Workflow
+**Note:** Be sure to add the entry in your hosts file.
+
+## Development Workflow
+
 Start the development environment:
-
 ```bash
-  skaffold dev
+skaffold dev
 ```
+
+## TODOs
+1. Implement comprehensive exception handling for the `oauth-server` and `totp-server`.
+2. Standardize response formats across all services.
+3. Integrate a load balancer to enhance system reliability and performance.
+4. Implement a messaging queue for better asynchronous processing.
+5. Ensure all data in the database is encrypted and sensitive information in logs is masked.
+
+## Contributing
+<!-- Contribution guidelines go here -->
+
+## License
+<!-- License information goes here -->
