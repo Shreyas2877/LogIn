@@ -2,6 +2,7 @@
 package com.trojan.loginserver.controller;
 
 import com.trojan.loginserver.dto.OAuthRequest;
+import com.trojan.loginserver.dto.SecretResponse;
 import com.trojan.loginserver.dto.SignupRequest;
 import com.trojan.loginserver.dto.LoginRequest;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
@@ -130,5 +131,16 @@ public class AuthController {
     public ResponseEntity<?> updatePassword(@RequestParam String email, @RequestParam String password) {
         userService.updatePassword(email, password);
         return ResponseEntity.ok("Password updated successfully");
+    }
+
+    @PostMapping("/saveSecret")
+    public ResponseEntity<?> saveSecret(@RequestParam String email, @RequestParam String secret) {
+        userService.saveSecret(email, secret);
+        return ResponseEntity.ok("Secret saved successfully");
+    }
+
+    @GetMapping("/get/secret")
+    public ResponseEntity<SecretResponse> getSecret(@RequestParam String email) {
+        return ResponseEntity.ok(userService.getSecret(email));
     }
 }

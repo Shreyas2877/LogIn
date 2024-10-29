@@ -1,5 +1,5 @@
 // src/controllers/authController.js
-import { login, signup, deregister, fetchProfile, logout, sendEmail, verifyOtp, sendVerEmail, verifyEmailToken, updateMfaStatus, sendPasswordRestEmail, resetPassword } from '../models/authModel';
+import { login, signup, deregister, fetchProfile, logout, sendEmail, verifyOtp, sendVerEmail, verifyEmailToken, updateMfaStatus, sendPasswordRestEmail, resetPassword, generateQrCode, validateTotp } from '../models/authModel';
 
 export const loginController = async (email, password) => {
     try {
@@ -118,5 +118,23 @@ export const resetPasswordController = async (email, password) => {
     } catch (error) {
         console.log("Error Caught : %s", error.message);
         return { success: false, statusCode: error.response.status, message: error.response?.data?.message || 'Reset password error' };
+    }
+};
+
+export const generateTotpQrCode = async (email) => {
+    try {
+        const response = await generateQrCode(email);
+        return { success: true, data: response.data };
+    } catch (error) {
+        return { success: false, message: error.message || 'Failed to generate qr code for authenticator' };
+    }
+};
+
+export const validateVerificationToken = async (email, code) => {
+    try {
+        const response = await validateTotp(email, code);
+        return { success: true, data: response.data };
+    } catch (error) {
+        return { success: false, message: error.message || 'Failed to validate verification token' };
     }
 };

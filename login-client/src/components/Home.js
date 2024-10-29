@@ -120,7 +120,8 @@ const Home = () => {
                 Authentication (MFA) feature. Users can authenticate using their
                 email, adding an extra layer of security to their accounts. MFA
                 helps prevent unauthorized access and ensures that only verified
-                users can access sensitive information.
+                users can access sensitive information. As of now our app provides 
+                two MFA methods, Email OTP and TOTP.
               </FeatureDescription>
             </CardContent>
           </AnimatedCard>

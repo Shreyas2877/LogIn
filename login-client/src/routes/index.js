@@ -10,6 +10,8 @@ import VerifyEmail from '../components/VerifyEmail.js';
 import { LoginProvider } from '../context/LoginContext.js';
 import ForgotPassword from '../components/ForgotPassword.js';
 import ResetPassword from '../components/ResetPassword.js';
+import OtpSelection from '../components/OtpSelection.js';
+import TotpLogin from '../components/TotpLogin.js';
 
 const AppRoutes = () => (
     <LoginProvider>
@@ -21,6 +23,8 @@ const AppRoutes = () => (
         <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/forgot-password" element={<ForgotPassword />}/>
         <Route path="/reset-password" element={<ResetPassword />}/>
+        <Route path="/totp" element={<TotpLogin />}/>
+        <Route path="/otp-selection" element={<OtpSelection />} />
         <Route path="/" element={<Home />} />
     </Routes>
     </LoginProvider>

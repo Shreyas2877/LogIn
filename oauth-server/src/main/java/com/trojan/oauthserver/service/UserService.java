@@ -7,6 +7,7 @@ package com.trojan.oauthserver.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -20,6 +21,9 @@ import java.util.Map;
 
 @Service
 public class UserService {
+
+    @Value("${user.service.url}")
+    private String userServiceUrl;
 
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
@@ -39,7 +43,7 @@ public class UserService {
         HttpEntity<Map<String, String>> request = new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<Map> responseEntity = restTemplate.exchange(
-                "http://localhost:8080/api/auth/saveUser",
+                userServiceUrl,
                 HttpMethod.POST,
                 request,
                 Map.class

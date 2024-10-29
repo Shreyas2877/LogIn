@@ -43,14 +43,22 @@ public class User {
     @Column(nullable = false)
     private MfaStatus mfaEnabled;
 
+    @Column
+    private String qrCodeSecret;
+
+    @Column
+    private boolean qrCodeEnabled;
+
     public User() {
         this.registrationTime = LocalDateTime.now();
         this.emailVerified = false;
         this.mfaEnabled = MfaStatus.FALSE;
+        this.qrCodeEnabled = false;
     }
 
-    public User(String email, String password, String userName, String provider, boolean emailVerified, MfaStatus mfaEnabled){
+    public User(String email, String password, String userName, String provider, boolean emailVerified, MfaStatus mfaEnabled, boolean qrCodeEnabled) {
         this.email = email;
+        this.qrCodeEnabled = qrCodeEnabled;
         this.password = password;
         this.userName = userName;
         this.provider = provider;
@@ -105,7 +113,7 @@ public class User {
     }
 
     public UserProfile getUserProfile() {
-        return new UserProfile(this.email, this.id, this.userName ,this.emailVerified, this.mfaEnabled);
+        return new UserProfile(this.email, this.id, this.userName ,this.emailVerified, this.mfaEnabled, this.qrCodeEnabled);
     }
 
     public String getEmailOtp() {
@@ -138,5 +146,25 @@ public class User {
 
     public void setMfaEnabled(MfaStatus mfaEnabled) {
         this.mfaEnabled = mfaEnabled;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public String getQrCodeSecret() {
+        return qrCodeSecret;
+    }
+
+    public void setQrCodeSecret(String qrCodeSecret) {
+        this.qrCodeSecret = qrCodeSecret;
+    }
+
+    public boolean isQrCodeEnabled() {
+        return qrCodeEnabled;
+    }
+
+    public void setQrCodeEnabled(boolean qrCodeEnabled) {
+        this.qrCodeEnabled = qrCodeEnabled;
     }
 }

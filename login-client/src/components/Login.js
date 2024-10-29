@@ -14,6 +14,7 @@ import {
   Alert,
   Link,
   Card,
+  Divider,
 } from "@mui/material";
 import { LoginContext } from "../context/LoginContext";
 import OAuth from "./OAuth";
@@ -49,7 +50,7 @@ const Login = () => {
   }, [successMessage]);
 
   useEffect(() => {
-    if (location.state && location.state.message) {
+    if (location.state?.message) {
       setSuccessMessage(location.state.message);
     }
   }, [location.state]);
@@ -57,16 +58,22 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
+  
     if (!email || !password) {
       setError("Email and password are required");
       return;
     }
-
+  
     const result = await loginController(email, password);
     if (result.success) {
       setHasLoggedIn(true);
-      if (result.data && result.data.mfaEnabled === "TRUE") {
+      const { mfaEnabled, qrCodeEnabled } = result.data;
+  
+      if (mfaEnabled === "TRUE" && qrCodeEnabled) {
+        // Both email OTP and TOTP are enabled
+        navigate("/otp-selection", { state: { email } }, { replace: true });
+      } else if (mfaEnabled === "TRUE") {
+        // Only email OTP is enabled
         try {
           await sendEmailController(email);
         } catch (error) {
@@ -76,6 +83,7 @@ const Login = () => {
         }
         navigate("/otp", { state: { email } }, { replace: true });
       } else {
+        // No MFA enabled
         navigate("/profile");
       }
     } else {
@@ -93,7 +101,7 @@ const Login = () => {
           color="#3f51b5"
           fontWeight="bold"
         >
-          Welcome Back to TrojApp!
+          Welcome to TrojApp
         </Typography>
         <Typography
           variant="subtitle1"
@@ -188,6 +196,13 @@ const Login = () => {
               New user? <Link href="/signup" color="#3f51b5">Sign up here</Link>
             </Typography>
           </Box>
+          <Box display="flex" alignItems="center" my={2}>
+              <Divider sx={{ flexGrow: 1 }} />
+              <Typography variant="body2" color="textSecondary" sx={{ mx: 2 }}>
+                or
+              </Typography>
+              <Divider sx={{ flexGrow: 1 }} />
+            </Box>
           <OAuth />
         </Card>
       </Box>
