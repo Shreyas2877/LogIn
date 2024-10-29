@@ -11,10 +11,12 @@ public class UserProfile {
     private String user;
     private boolean emailVerified;
     private MfaStatus mfaEnabled;
+    private boolean qrCodeEnabled;
 
 
-    public UserProfile(String email, Long id, String user, boolean emailVerified, MfaStatus mfaEnabled) {
+    public UserProfile(String email, Long id, String user, boolean emailVerified, MfaStatus mfaEnabled, boolean qrCodeEnabled) {
         this.email = email;
+        this.qrCodeEnabled = qrCodeEnabled;
         this.id = id;
         this.user = user;
         this.emailVerified = emailVerified;
@@ -60,5 +62,13 @@ public class UserProfile {
 
     public void setMfaEnabled(MfaStatus mfaEnabled) {
         this.mfaEnabled = mfaEnabled;
+    }
+
+    public boolean isQrCodeEnabled() {
+        return qrCodeEnabled;
+    }
+
+    public void setQrCodeEnabled(boolean qrCodeEnabled) {
+        this.qrCodeEnabled = qrCodeEnabled;
     }
 }

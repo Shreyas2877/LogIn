@@ -58,16 +58,22 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
-
+  
     if (!email || !password) {
       setError("Email and password are required");
       return;
     }
-
+  
     const result = await loginController(email, password);
     if (result.success) {
       setHasLoggedIn(true);
-      if (result.data && result.data.mfaEnabled === "TRUE") {
+      const { mfaEnabled, qrCodeEnabled } = result.data;
+  
+      if (mfaEnabled === "TRUE" && qrCodeEnabled) {
+        // Both email OTP and TOTP are enabled
+        navigate("/otp-selection", { state: { email } }, { replace: true });
+      } else if (mfaEnabled === "TRUE") {
+        // Only email OTP is enabled
         try {
           await sendEmailController(email);
         } catch (error) {
@@ -77,6 +83,7 @@ const Login = () => {
         }
         navigate("/otp", { state: { email } }, { replace: true });
       } else {
+        // No MFA enabled
         navigate("/profile");
       }
     } else {

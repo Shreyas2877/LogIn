@@ -1,4 +1,5 @@
 // src/models/authModel.js
+import axios from 'axios';
 import axiosInstance from '../apiConfig';
 
 export const login = (email, password) => {
@@ -47,4 +48,16 @@ export const sendPasswordRestEmail = (email) => {
 
 export const resetPassword = (email, password) => {
     return axiosInstance.post('/auth/updatePassword?email='+email+'&password='+password);
+}
+
+export const generateQrCode = (email) => {
+    return axios.get('http://localhost:8082/api/totp/qr/generate?email=' + email, {
+        withCredentials: true
+    });
+}
+
+export const validateTotp = (email, code) => {
+    return axios.post('http://localhost:8082/api/totp/login?email=' + email + '&code=' + code, {}, {
+        withCredentials: true
+    });
 }

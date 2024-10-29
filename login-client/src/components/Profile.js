@@ -98,6 +98,7 @@ const Profile = () => {
                   emailVerified={profile.emailVerified} 
                   mfaEnabled={profile.mfaEnabled} 
                   email={profile.email}
+                  qrCodeEnabled={profile.qrCodeEnabled}
                 /> 
               </>
             );

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import Card from '@mui/material/Card';
+import Card from "@mui/material/Card";
 import { useNavigate } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import {
@@ -7,13 +7,19 @@ import {
   Button,
   CardContent,
   Switch,
-  Typography
+  Typography,
 } from "@material-ui/core";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import Alert from "@mui/lab/Alert";
 import StyledCard from "./StyledCard";
 import StyledHr from "./StyledHr";
-import { sendVerificationEmail, updateMfa, deleteUser, logoutController } from "../controllers/authController";
+import {
+  sendVerificationEmail,
+  updateMfa,
+  deleteUser,
+  logoutController,
+  generateTotpQrCode,
+} from "../controllers/authController";
 import DeleteProfileCard from "./DeleteProfileCard";
 
 const useStyles = makeStyles((theme) => ({
@@ -41,17 +47,26 @@ const useStyles = makeStyles((theme) => ({
   deleteButton: {
     backgroundColor: theme.palette.error.main,
     color: theme.palette.common.white,
-    '&:hover': {
+    "&:hover": {
       backgroundColor: theme.palette.error.dark,
     },
   },
   centerBox: {
-    display: 'flex',
-    justifyContent: 'center',
+    display: "flex",
+    justifyContent: "center",
+  },
+  qrCode: {
+    marginTop: "10px",
+    textAlign: "center",
   },
 }));
 
-const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
+const SecuritySettings = ({
+  emailVerified,
+  mfaEnabled,
+  email,
+  qrCodeEnabled,
+}) => {
   const navigate = useNavigate();
   const classes = useStyles();
   const [isChanged, setIsChanged] = useState(false);
@@ -60,7 +75,8 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
   const [isVerifyEmailDisabled, setIsVerifyEmailDisabled] = useState(false);
   const [isMfaEnabled, setIsMfaEnabled] = useState(mfaEnabled === "TRUE");
   const [initialMfaEnabled] = useState(mfaEnabled === "TRUE"); // Track the initial state of MFA
-  const [enteredEmail, setEnteredEmail] = useState('');
+  const [enteredEmail, setEnteredEmail] = useState("");
+  const [qrCodeUrl, setQrCodeUrl] = useState("");
 
   useEffect(() => {
     // Check if there's a change in the MFA status compared to the initial value
@@ -70,7 +86,6 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
       setIsChanged(false);
     }
   }, [isMfaEnabled, initialMfaEnabled]);
-
 
   const handleInteraction = () => {
     setIsChanged(true);
@@ -96,10 +111,10 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
   };
 
   const handleUpdateProfile = async () => {
-    const mfaStatus = isMfaEnabled ? 'TRUE' : 'FALSE';
+    const mfaStatus = isMfaEnabled ? "TRUE" : "FALSE";
     const result = await updateMfa(email, mfaStatus);
     if (result.success) {
-      console.log('MFA status updated successfully');
+      console.log("MFA status updated successfully");
       setAlertMessage("Profile updated successfully.");
       setAlertSeverity("success");
       setTimeout(() => {
@@ -119,96 +134,134 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
 
   const handleDeleteProfile = async () => {
     deleteUser(email);
-    console.log('Delete profile clicked');
+    console.log("Delete profile clicked");
     await logoutController();
+  };
+
+  const handleGenerateQrCode = async () => {
+    try {
+      const response = await generateTotpQrCode(email);
+      console.log("Response as string: ", JSON.stringify(response));
+      setQrCodeUrl(`data:image/png;base64,${response.data}`);
+    } catch (error) {
+      console.error("Error generating QR code:", error);
+      setAlertMessage("Failed to generate QR code. Please try again.");
+      setAlertSeverity("error");
+    }
   };
 
   return (
     <>
-    <StyledCard>
-      <CardContent>
-        <Box mb={2}>
-          <Typography variant="h6" className={classes.title}>
-            Account Settings
-          </Typography>
-        </Box>
-        {alertMessage && (
-          <Alert severity={alertSeverity} onClose={() => setAlertMessage("")}>
-            {alertMessage}
-          </Alert>
-        )}
-        <Box mt={3} mb={3}>
-          <Typography variant="subtitle1" className={classes.subtitle}>
-            Verify Email
-          </Typography>
-          <Typography variant="body2" className={classes.body}>
-            Unlock security features for this account by verifying your email.
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            className={classes.button}
-            disabled={emailVerified || isVerifyEmailDisabled}
-            onClick={handleVerifyEmail}
-          >
-            Verify Email
-          </Button>
-          {emailVerified && (
-            <Typography className={classes.verifiedText}>
-              Verified <CheckCircleIcon className={classes.icon} />
+      <StyledCard>
+        <CardContent>
+          <Box mb={2}>
+            <Typography variant="h6" className={classes.title}>
+              Account Settings
             </Typography>
+          </Box>
+          {alertMessage && (
+            <Alert severity={alertSeverity} onClose={() => setAlertMessage("")}>
+              {alertMessage}
+            </Alert>
           )}
-        </Box>
-        <StyledHr />
-        <Box mt={3} mb={3}>
-          <Typography variant="subtitle1" className={classes.subtitle}>
-            Enable MFA
-          </Typography>
-          <Typography variant="body2" className={classes.body}>
-            Enable MFA in your profile for step-up authentications.
-          </Typography>
-          {mfaEnabled === "DISABLED" ? (
-            <Typography className={classes.disabledText}>
-              MFA not available for social logins
+          <Box mt={3} mb={3}>
+            <Typography variant="subtitle1" className={classes.subtitle}>
+              Verify Email
             </Typography>
-          ) : (
-            <>
-              <Typography component="div" style={{ marginTop: "10px" }}>
-                Enable MFA
-                <Switch
-                  color="primary"
-                  checked={isMfaEnabled}
-                  onChange={handleMfaChange}
-                  disabled={!emailVerified}
-                />
+            <Typography variant="body2" className={classes.body}>
+              Unlock security features for this account by verifying your email.
+            </Typography>
+            <Button
+              variant="contained"
+              color="primary"
+              className={classes.button}
+              disabled={emailVerified || isVerifyEmailDisabled}
+              onClick={handleVerifyEmail}
+            >
+              Verify Email
+            </Button>
+            {emailVerified && (
+              <Typography className={classes.verifiedText}>
+                Verified <CheckCircleIcon className={classes.icon} />
               </Typography>
-              {!emailVerified && (
-                <Typography className={classes.disabledText}>
-                  Verify email to enable MFA
+            )}
+          </Box>
+          <StyledHr />
+          <Box mt={3} mb={3}>
+            <Typography variant="subtitle1" className={classes.subtitle}>
+              Enable MFA
+            </Typography>
+            <Typography variant="body2" className={classes.body}>
+              Enable MFA in your profile for step-up authentications.
+            </Typography>
+            {mfaEnabled === "DISABLED" ? (
+              <Typography className={classes.disabledText}>
+                MFA not available for social logins
+              </Typography>
+            ) : (
+              <>
+                <Typography component="div" style={{ marginTop: "10px" }}>
+                  Enable MFA
+                  <Switch
+                    color="primary"
+                    checked={isMfaEnabled}
+                    onChange={handleMfaChange}
+                    disabled={!emailVerified}
+                  />
                 </Typography>
-              )}
-              {isMfaEnabled && emailVerified && (
-                <Typography className={classes.verifiedText}>
-                  MFA Enabled <CheckCircleIcon className={classes.icon} />
-                </Typography>
-              )}
-            </>
-          )}
-        </Box>
-        <StyledHr />
-        <Box mt={3}>
-          <Button
-            variant="contained"
-            color="secondary"
-            disabled={!isChanged}
-            onClick={handleUpdateProfile}
-          >
-            Update Profile
-          </Button>
-        </Box>
-      </CardContent>
-    </StyledCard>
-    <Card sx={{ backgroundColor: '#333' , borderRadius: 2}}>
+                {!emailVerified && (
+                  <Typography className={classes.disabledText}>
+                    Verify email to enable MFA
+                  </Typography>
+                )}
+                {isMfaEnabled && emailVerified && (
+                  <>
+                    <Typography className={classes.verifiedText}>
+                      MFA Enabled <CheckCircleIcon className={classes.icon} />
+                    </Typography>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      className={classes.button}
+                      onClick={handleGenerateQrCode}
+                      disabled={qrCodeEnabled}
+                    >
+                      Generate TOTP QR Code
+                    </Button>
+                    {qrCodeEnabled && (
+                      <Typography
+                        variant="body2"
+                        className={classes.disabledText}
+                        style={{ marginTop: "10px" }}
+                      >
+                        The TOTP QR code has already been set-up for this account. If you need
+                        to request a new QR code, please contact us.
+                      </Typography>
+                    )}
+                    {qrCodeUrl && (
+                      <Box className={classes.qrCode}>
+                        <img src={qrCodeUrl} alt="TOTP QR Code" />
+                      </Box>
+                    )}
+                  </>
+                )}
+              </>
+            )}
+          </Box>
+          <StyledHr />
+          <Box mt={3}>
+            <Button
+              variant="contained"
+              color="secondary"
+              disabled={!isChanged}
+              onClick={handleUpdateProfile}
+            >
+              Update Profile
+            </Button>
+          </Box>
+        </CardContent>
+      </StyledCard>
+      <Card sx={{ backgroundColor: "#333", borderRadius: 2 }}>
         <CardContent>
           <Box>
             <DeleteProfileCard
@@ -221,7 +274,7 @@ const SecuritySettings = ({ emailVerified, mfaEnabled, email }) => {
           </Box>
         </CardContent>
       </Card>
-      </>
+    </>
   );
 };
 

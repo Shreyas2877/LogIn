@@ -1,6 +1,7 @@
 // src/main/java/com/trojan/loginserver/service/UserService.java
 package com.trojan.loginserver.service;
 
+import com.trojan.loginserver.dto.SecretResponse;
 import com.trojan.loginserver.exception.DatabaseException;
 import com.trojan.loginserver.exception.ResourceNotFoundException;
 import com.trojan.loginserver.model.MfaStatus;
@@ -51,7 +52,7 @@ public class UserService {
         logger.debug("Registering user with email: {}", email);
         String encodedPassword = passwordEncoder.encode(password);
         try {
-            userRepository.save(new User(email, encodedPassword, userName, Provider, false, MfaStatus.FALSE));
+            userRepository.save(new User(email, encodedPassword, userName, Provider, false, MfaStatus.FALSE, false));
             logger.info("User registered successfully with email: {}", email);
         } catch (Exception e) {
             logger.error("Error saving user to database for email: {}", email, e);
@@ -91,7 +92,7 @@ public class UserService {
             return existingUser.get().getUserProfile();
         }
         try {
-            return userRepository.save(new User(email, null, userName, provider, true, MfaStatus.DISABLED)).getUserProfile();
+            return userRepository.save(new User(email, null, userName, provider, true, MfaStatus.DISABLED, false)).getUserProfile();
         } catch (Exception e) {
             logger.error("Error saving OAuth user to database for email: {}", email, e);
             throw new DatabaseException("Error saving OAuth user to database");
@@ -162,5 +163,33 @@ public class UserService {
             logger.warn("User not found for updating password with email: {}", email);
             throw new ResourceNotFoundException("User Not Found");
         });
+    }
+
+    public void saveSecret(String email, String secret) {
+        logger.debug("Saving secret for user with email: {}", email);
+        Optional<User> user = userRepository.findByEmail(email);
+        user.ifPresentOrElse(u -> {
+            u.setQrCodeSecret(secret);
+            u.setQrCodeEnabled(true);
+            userRepository.save(u);
+            logger.info("Secret saved successfully for user with email: {}", email);
+        }, () -> {
+            logger.warn("User not found for saving secret with email: {}", email);
+            throw new ResourceNotFoundException("User Not Found");
+        });
+    }
+
+    public SecretResponse getSecret(String email) {
+        logger.debug("Fetching secret for user with email: {}", email);
+        Optional<User> user = userRepository.findByEmail(email);
+        SecretResponse secretResponse = new SecretResponse();
+        if(user.isPresent()){
+            logger.info("Secret fetched successfully for user with email: {}", email);
+            secretResponse.setSecret(user.get().getQrCodeSecret());
+            secretResponse.setId(user.get().getId());
+            return secretResponse;
+        }
+        logger.warn("User not found for fetching secret with email: {}", email);
+        throw new ResourceNotFoundException("User Not Found");
     }
 }
