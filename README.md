@@ -1,6 +1,6 @@
 # Login Application
 
-<img src="./System Design Diagrams/Troj-App System Diagram Build 1.0.png" alt="Login Application" style="width:100%; max-width:600px; display:block; margin:auto;"/>
+<!-- <img src="" alt="Login Application" style="width:100%; max-width:600px; display:block; margin:auto;"/> -->
 
 A secure, modern login application built with **React** on the frontend and **Spring Boot** on the backend, utilizing **JWT-based authentication** and **OAuth 2.0** (Google & GitHub) for account synchronization across multiple login options. It includes **multi-factor authentication (MFA)** with both email OTP and TOTP support (via Microsoft and Google Authenticators).
 
@@ -38,7 +38,7 @@ The application comprises three backend services and one frontend service:
   <li>💻 <strong>login-client</strong>: React-based frontend for user interaction.</li>
 </ul>
 
-<img src="path/to/architecture-diagram.png" alt="Architecture Diagram" style="width:100%; max-width:600px; display:block; margin:auto;"/>
+<img src="./System Design Diagrams/Troj-App System Diagram Build 1.0.png" alt="Architecture Diagram" style="width:100%; max-width:600px; display:block; margin:auto;"/>
 
 ## Tech Stack
 <ul style="list-style-type: none;">
