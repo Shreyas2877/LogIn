@@ -217,7 +217,7 @@ const SecuritySettings = ({
                 {isMfaEnabled && emailVerified && (
                   <>
                     <Typography className={classes.verifiedText}>
-                      MFA Enabled <CheckCircleIcon className={classes.icon} />
+                      Enabled<CheckCircleIcon className={classes.icon} />
                     </Typography>
                     <Button
                       variant="contained"
