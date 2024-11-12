@@ -12,6 +12,7 @@ import ForgotPassword from '../components/ForgotPassword.js';
 import ResetPassword from '../components/ResetPassword.js';
 import OtpSelection from '../components/OtpSelection.js';
 import TotpLogin from '../components/TotpLogin.js';
+import Chat from '../components/Chat.js';
 
 const AppRoutes = () => (
     <LoginProvider>
@@ -25,6 +26,7 @@ const AppRoutes = () => (
         <Route path="/reset-password" element={<ResetPassword />}/>
         <Route path="/totp" element={<TotpLogin />}/>
         <Route path="/otp-selection" element={<OtpSelection />} />
+        <Route path="//chat" element={<Chat />} />
         <Route path="/" element={<Home />} />
     </Routes>
     </LoginProvider>

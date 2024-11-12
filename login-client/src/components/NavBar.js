@@ -12,6 +12,7 @@ const NavBar = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const isProfilePage = location.pathname === '/profile';
+    const isChatPage = location.pathname === '/chat';
     const isHomePage = location.pathname === '/';
     const isLoginPage = location.pathname === '/login';
     const isSignUpPage = location.pathname === '/signup';
@@ -28,20 +29,20 @@ const NavBar = () => {
     return (
         <AppBar position="static" sx={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', backdropFilter: 'blur(10px)' }}>
             <Toolbar>
-                {!isProfilePage && (
+                {!isProfilePage && !isChatPage && (
                     <IconButton
                         edge="start"
                         color="inherit"
                         aria-label="home"
                         component={Link}
                         to="/"
-                        style={{ display: isProfilePage ? 'none' : 'inline-flex' }}
+                        style={{ display: isProfilePage || isChatPage ? 'none' : 'inline-flex' }}
                     >
                         <HomeIcon />
                     </IconButton>
                 )}
                 <Box flexGrow={1} />
-                {isProfilePage ? (
+                {(isProfilePage || isChatPage) ? (
                     <IconButton
                         edge="end"
                         color="inherit"

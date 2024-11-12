@@ -52,7 +52,7 @@ const DeleteProfileCard = ({ email }) => {
     try {
       await handleDeleteProfile();
       setSuccessMessage('Account deleted successfully. Redirecting to login...');
-      setTimeout(() => navigate('/login'), 3000);
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       console.error('Failed to delete account:', err);
       setError('Failed to delete account. Please try again.');

@@ -61,3 +61,21 @@ export const validateTotp = (email, code) => {
         withCredentials: true
     });
 }
+
+export const sendMessage = (senderId, senderName, content, timeStamp) => {
+    return axios.post('http://localhost:8084/api/chat/message', {
+        senderId: senderId,
+        senderName: senderName,
+        content: content,
+        timeStamp: timeStamp
+    },
+    {
+        withCredentials: true
+    });
+};
+
+export const getMessages = () => {
+    return axios.get('http://localhost:8084/api/chat/messages', {
+        withCredentials: true
+    });
+};

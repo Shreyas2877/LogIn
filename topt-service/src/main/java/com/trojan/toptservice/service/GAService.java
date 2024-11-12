@@ -48,7 +48,6 @@ public class GAService {
         if (secretResponse == null) {
             return null;
         }
-
         GoogleAuthenticator gAuth = new GoogleAuthenticator(
                 new GoogleAuthenticatorConfig.GoogleAuthenticatorConfigBuilder().build()
         );
@@ -61,7 +60,6 @@ public class GAService {
                 .queryParam("email", email)
                 .build()
                 .toUri();
-
         try {
             ResponseEntity<SecretResponse> response = restTemplate.getForEntity(uri, SecretResponse.class);
             return response.getBody();

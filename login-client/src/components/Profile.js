@@ -1,4 +1,3 @@
-// src/components/Profile.js
 import React, { useEffect, useState } from "react";
 import {
   Container,
@@ -7,8 +6,11 @@ import {
   Card,
   CardContent,
   Avatar,
+  Tooltip,
+  IconButton,
 } from "@mui/material";
 import { styled } from "@mui/system";
+import ChatIcon from "@mui/icons-material/Chat";
 import { fetchProfileController } from "../controllers/authController";
 import { useNavigate } from "react-router-dom";
 import { fadeInBackground, AnimatedAlert, fadeInDown } from "./animations";
@@ -90,6 +92,21 @@ const Profile = () => {
                       <Typography variant="h5" component="div">
                         {profile.user}
                       </Typography>
+                      <Tooltip title="Go to Chat" arrow>
+                        <IconButton
+                          sx={{
+                            marginLeft: "auto",
+                            backgroundColor: "#ff5722",
+                            color: "white",
+                            "&:hover": {
+                              backgroundColor: "#e64a19",
+                            },
+                          }}
+                          onClick={() => navigate("/chat", { state: { username: profile.user, userid: profile.id } })}
+                        >
+                          <ChatIcon />
+                        </IconButton>
+                      </Tooltip>
                     </Box>
                     <Typography variant="body2">Email: {profile.email}</Typography>
                   </CardContent>

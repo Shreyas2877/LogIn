@@ -1,5 +1,5 @@
 // src/controllers/authController.js
-import { login, signup, deregister, fetchProfile, logout, sendEmail, verifyOtp, sendVerEmail, verifyEmailToken, updateMfaStatus, sendPasswordRestEmail, resetPassword, generateQrCode, validateTotp } from '../models/authModel';
+import { login, signup, deregister, fetchProfile, logout, sendEmail, verifyOtp, sendVerEmail, verifyEmailToken, updateMfaStatus, sendPasswordRestEmail, resetPassword, generateQrCode, validateTotp, sendMessage, getMessages } from '../models/authModel';
 
 export const loginController = async (email, password) => {
     try {
@@ -136,5 +136,25 @@ export const validateVerificationToken = async (email, code) => {
         return { success: true, data: response.data };
     } catch (error) {
         return { success: false, message: error.message || 'Failed to validate verification token' };
+    }
+};
+
+export const postMessage = async (senderId, senderName, content, timeStamp) => {
+    try {
+        const response = await sendMessage(senderId, senderName, content, timeStamp);
+        return { success: true, data: response.data };
+    }
+    catch (error) {
+        return { success: false, message: error.message || 'Failed to send message' };
+    }
+};
+
+export const fetchMessages = async () => {
+    try {
+        const response = await getMessages();
+        return { success: true, data: response.data };
+    }
+    catch (error) {
+        return { success: false, message: error.message || 'Failed to fetch messages' };
     }
 };
